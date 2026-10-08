@@ -23,26 +23,10 @@ jobs:
         run: npx expo@51 config --type public > /dev/null
 
       - name: TypeScript check
-        id: tsc
-        shell: bash
-        run: |
-          set +e
-          npx -p typescript@5.3.3 tsc --noEmit --pretty false 2>&1 | tee /tmp/tsc.log
-          status=${PIPESTATUS[0]}
-          exit ${status}
+        run: npx -p typescript@5.3.3 tsc --noEmit --pretty false
 
       - name: Web bundle smoke test
         run: npx expo@51 export --platform web --output-dir .expo-web-smoke
-
-      - name: Web build error report
-        if: failure() && steps.web.outcome == 'failure'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs')
-            const body = fs.existsSync('/tmp/web.log') ? fs.readFileSync('/tmp/web.log', 'utf8') : 'No web build log captured.'
-            const comment = ['### Temporary web bundle output', '', '```text', body.slice(0, 18000), '```'].join('\n')
-            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: comment })
 
       - name: Parse TypeScript source
         run: npx prettier@3 App.tsx --parser typescript > /dev/null
