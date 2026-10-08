@@ -1,6 +1,6 @@
-# Spendly
+# FhooKkkDiya
 
-Spendly is a sleek, local-first expense tracker built with Expo and React Native. It helps users quickly log their daily spending, review past entries, and understand where their money goes without needing a bank connection, account setup, or any backend service.
+FhooKkkDiya is a sleek, local-first expense tracker built with Expo and React Native. It helps users quickly log their daily spending, review past entries, and understand where their money goes without needing a bank connection, account setup, or any backend service.
 
 The app is intentionally simple: add an expense, assign a category, track today’s spending, and check category-wise totals in seconds.
 
@@ -26,7 +26,7 @@ The app is intentionally simple: add an expense, assign a category, track today�
 ## Project Structure
 
 ```text
-Spendly/
+FhooKkkDiya/
 ├── App.tsx              # Main application UI and logic
 ├── index.js             # Expo app entry point
 ├── app.json             # Expo project configuration
@@ -63,8 +63,8 @@ A welcome screen appears on first launch, and the app stores all entry data loca
 ### Install dependencies
 
 ```bash
-git clone https://github.com/Niteshkanwar007/Spendly.git
-cd Spendly
+git clone https://github.com/Niteshkanwar007/FhooKkkDiya.git
+cd FhooKkkDiya
 npm install
 ```
 
@@ -90,7 +90,7 @@ npx expo export --platform web
 
 ## Local Storage
 
-Spendly stores expenses and preferences locally with AsyncStorage. That means:
+FhooKkkDiya stores expenses and preferences locally with AsyncStorage. That means:
 
 - data stays on the same device/browser
 - there is no multi-device sync
