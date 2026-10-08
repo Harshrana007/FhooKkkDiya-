@@ -440,6 +440,16 @@ export default function App() {
                     </TouchableOpacity>
                   </View>
                   <View style={styles.divider} />
+                  <View style={styles.rowBetween}>
+                    <View style={styles.flex}>
+                      <Text style={styles.expenseName}>Gaali Mode</Text>
+                      <Text style={styles.muted}>MC/BC + desi abuse when the wallet deserves it.</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => setGaaliMode(v => !v)} style={[styles.toggle, gaaliMode && styles.toggleOn]}>
+                      <View style={[styles.knob, gaaliMode && styles.knobOn]} />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.divider} />
                   <Text style={styles.sectionTitle}>About FhooKkkDiya</Text>
                   <Text style={styles.muted}>Private, local aur thoda besharam expense tracker. No account. No bank connection. Sirf sach. Gaali Mode optional hai. Wallet ko tameez se bhi daant sakte ho.</Text>
                 </View>
