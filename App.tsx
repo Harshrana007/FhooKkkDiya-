@@ -437,7 +437,7 @@ export default function App() {
                 </View>
                 {expenses.map(expense => (
                   <TouchableOpacity key={expense.id} onLongPress={() => deleteExpense(expense.id)} style={styles.expenseRow}>
-                    <View style={styles.expenseIcon}><Text style={styles.expenseIconText}>₹</Text></View>
+                    <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.mint} /></View>
                     <View style={styles.expenseCopy}><Text style={styles.expenseName}>{expense.description}</Text><Text style={styles.muted}>{expense.category} • {expense.date}</Text></View>
                     <Text style={styles.expenseAmount}>{currency(expense.amount)}</Text>
                   </TouchableOpacity>
@@ -502,13 +502,17 @@ export default function App() {
 
         <View style={styles.nav}>
           {([
-            ['today', 'Aaj Ka Haal', '⌂'],
-            ['history', 'Qissa', '▤'],
-            ['reports', 'Hisaab', '◒'],
-            ['settings', 'Jugaad', '⚙'],
-          ] as const).map(([key, label, icon]) => (
+            ['today', 'Aaj Ka Haal'],
+            ['history', 'Qissa'],
+            ['reports', 'Hisaab'],
+            ['settings', 'Jugaad'],
+          ] as const).map(([key, label]) => (
             <TouchableOpacity key={key} onPress={() => setTab(key)} style={styles.navItem}>
-              <Text style={[styles.navIcon, tab === key && styles.active]}>{icon}</Text>
+              <SvgIcon
+                xml={{ today: ICON_HOME, history: ICON_HISTORY, reports: ICON_REPORTS, settings: ICON_SETTINGS }[key]}
+                size={20}
+                color={tab === key ? colors.purple : colors.dim}
+              />
               <Text style={[styles.navLabel, tab === key && styles.active]}>{label}</Text>
             </TouchableOpacity>
           ))}
@@ -617,7 +621,6 @@ const styles = StyleSheet.create({
   chipTextActive: { color: '#D0C6FF', fontWeight: '900' },
   primaryButton: { flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: colors.purple, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
   primaryText: { color: colors.white, fontWeight: '900' },
-  primaryArrow: { color: colors.white, fontSize: 17, fontWeight: '900' },
   miniHero: { backgroundColor: colors.surface2, borderRadius: 20, borderWidth: 1, borderColor: colors.border, padding: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   miniTotal: { color: colors.text, fontSize: 31, fontWeight: '900', marginTop: 4 },
   badge: { width: 62, height: 62, borderRadius: 20, backgroundColor: colors.purpleSoft, borderWidth: 1, borderColor: '#463773', alignItems: 'center', justifyContent: 'center' },
@@ -631,7 +634,6 @@ const styles = StyleSheet.create({
   knobOn: { alignSelf: 'flex-end' },
   nav: { flexDirection: 'row', paddingTop: 9, paddingBottom: 7, backgroundColor: '#090C12', borderTopWidth: 1, borderTopColor: colors.border },
   navItem: { flex: 1, alignItems: 'center', gap: 3 },
-  navIcon: { fontSize: 18, color: '#61687A' },
   navLabel: { fontSize: 10, fontWeight: '900', color: '#61687A' },
   active: { color: colors.purple },
   modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(2,3,7,0.82)', justifyContent: 'flex-end' },
