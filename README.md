@@ -16,8 +16,9 @@ This release adds the salary system, context-aware comedy tiers, CID/Instagram-s
 
 ### Money tracking
 - Add an expense with description, amount, and category.
+- Tap an expense to edit it; long-press to delete with confirmation.
 - Quick-add multiple expenses in one go.
-- Long-press an expense to open a delete confirmation.
+- Salary can be created, updated, read on the dashboard, or reset from Jugaad without touching expenses.
 - Today, History/Qissa, Hisaab/Reports, and Jugaad/Settings modules.
 - All expense data is stored locally with AsyncStorage.
 - Legacy Spendly expense data is migrated forward when present.
@@ -43,7 +44,7 @@ Higher tiers move into investigation/CID-style reactions and final-boss jokes ra
 
 ### Comedy modes
 - Original Hinglish sarcasm.
-- Optional MC/BC/English profanity through Mode.
+- Optional MC/BC/English profanity through Gaali Mode.
 - Indian comedy-film archetype humour.
 - CID-style investigation reactions.
 - Instagram/Reels-style meme language.
@@ -88,7 +89,7 @@ Current local keys:
 
 - `@fhookkdiya/expenses`
 - `@fhookkdiya/monthly-salary`
-- `@fhookkdiya/-mode`
+- `@fhookkdiya/gaali-mode`
 - `@fhookkdiya/welcome-seen`
 
 Legacy Spendly keys for expenses and onboarding are still read for migration compatibility.
