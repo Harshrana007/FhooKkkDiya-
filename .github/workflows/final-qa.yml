@@ -1,8 +1,3 @@
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-
 name: Final QA
 
 on:
@@ -36,23 +31,8 @@ jobs:
           status=${PIPESTATUS[0]}
           exit ${status}
 
-      - name: TypeScript error report
-        if: failure() && steps.tsc.outcome == 'failure'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs')
-            const body = fs.existsSync('/tmp/tsc.log') ? fs.readFileSync('/tmp/tsc.log', 'utf8') : 'No TypeScript log captured.'
-            const comment = ['### Temporary TypeScript compiler output', '', '```text', body.slice(0, 18000), '```'].join('\n')
-            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: comment })
       - name: Web bundle smoke test
-        id: web
-        shell: bash
-        run: |
-          set +e
-          npx expo@51 export --platform web --output-dir .expo-web-smoke 2>&1 | tee /tmp/web.log
-          status=${PIPESTATUS[0]}
-          exit ${status}
+        run: npx expo@51 export --platform web --output-dir .expo-web-smoke
 
       - name: Web build error report
         if: failure() && steps.web.outcome == 'failure'
