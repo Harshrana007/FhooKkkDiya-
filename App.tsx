@@ -669,7 +669,7 @@ export default function App() {
             <Text style={styles.welcomeTitle}>Hi Gutz Bhoiii.</Text>
             <Text style={styles.welcomeAccent}>FhooKkkDiya mein khush aamdeed.</Text>
             <Text style={styles.welcomeCopy}>
-              Welcome! Pehle hi bata do, khud ki marzi se aaye ho ya bank balance dekh ke rona aa raha tha?
+              Welcome. Khud ki marzi se aaye ho ya bank balance ne bulaya? 😭
             </Text>
             <View style={styles.quoteCard}>
               <Text style={styles.quoteKicker}>PEHLA SETUP</Text>
@@ -759,7 +759,7 @@ export default function App() {
                     <Text style={styles.kicker}>AAJ KA HAAL</Text>
                     <Text style={styles.title}>{readableDate(today)}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => setQuickEntry(true)} style={styles.quickButton}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quick add expenses" onPress={() => setQuickEntry(true)} style={styles.quickButton}>
                     <Text style={styles.quickText}>Jaldi se daal</Text>
                   </TouchableOpacity>
                 </View>
@@ -804,13 +804,13 @@ export default function App() {
                 </View>
 
                 <View style={styles.rowBetween}>
-                  <Text style={styles.sectionTitle}>Aaj ka qissa</Text>
+                  <Text style={styles.sectionTitle}>🧾 Aaj ka qissa</Text>
                   <Text style={styles.muted}>{todayExpenses.length} items</Text>
                 </View>
 
                 {todayExpenses.length === 0 ? (
                   <View style={styles.empty}>
-                    <Text style={styles.emptyBig}>₹0</Text>
+                    <Text style={styles.emptyBig}>🫡 ₹0</Text>
                     <Text style={styles.emptyTitle}>Abhi tak koi barbaadi nahi.</Text>
                     <Text style={styles.muted}>Neeche se pehla kharcha chipkao.</Text>
                   </View>
@@ -828,7 +828,7 @@ export default function App() {
                 )}
 
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>Kharcha chipka</Text>
+                  <Text style={styles.sectionTitle}>💸 Kharcha chipka</Text>
                   <Text style={styles.formHint}>Bas sach bol. App judge karega, par silently.</Text>
                   <TextInput value={description} onChangeText={setDescription} placeholder="Kis cheez pe udaaya?" placeholderTextColor={colors.dim} style={styles.input} />
                   <TextInput value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="Kitne rupaye?" placeholderTextColor={colors.dim} style={styles.input} />
@@ -855,7 +855,7 @@ export default function App() {
             {visibleTab === 'history' && (
               <>
                 <Text style={styles.kicker}>MONEY TRAIL</Text>
-                <Text style={styles.title}>Kharchon ka Qissa</Text>
+                <Text style={styles.title}>🧾 Kharchon ka Qissa</Text>
                 <View style={styles.miniHero}>
                   <View><Text style={styles.label}>ALL TIME</Text><Text style={styles.miniTotal}>{currency(allTotal)}</Text></View>
                   <View style={styles.badge}><Text style={styles.badgeNum}>{expenses.length}</Text><Text style={styles.muted}>entries</Text></View>
@@ -867,20 +867,20 @@ export default function App() {
                     <Text style={styles.expenseAmount}>{currency(expense.amount)}</Text>
                   </TouchableOpacity>
                 ))}
-                {!expenses.length && <View style={styles.empty}><Text style={styles.emptyBig}>404</Text><Text style={styles.emptyTitle}>History bhi tumhari tarah shareef hai.</Text><Text style={styles.muted}>Abhi kuch nahi mila.</Text></View>}
+                {!expenses.length && <View style={styles.empty}><Text style={styles.emptyBig}>🕵️ 404</Text><Text style={styles.emptyTitle}>History bhi tumhari tarah shareef hai.</Text><Text style={styles.muted}>Abhi kuch nahi mila.</Text></View>}
               </>
             )}
 
             {visibleTab === 'reports' && (
               <>
                 <Text style={styles.kicker}>PAISA KAHAN GAYA?</Text>
-                <Text style={styles.title}>Hisaab</Text>
+                <Text style={styles.title}>📊 Hisaab</Text>
                 <View style={styles.miniHero}>
                   <View><Text style={styles.label}>TOTAL SPENDING</Text><Text style={styles.miniTotal}>{currency(allTotal)}</Text></View>
                   <Text style={styles.muted}>{expenses.length} expenses</Text>
                 </View>
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>Paisa gaya kahan, janaab?</Text>
+                  <Text style={styles.sectionTitle}>🕵️ Paisa gaya kahan, janaab?</Text>
                   {!categoryTotals.length && <Text style={styles.muted}>Pehle paisa udaao, phir breakdown pe rona.</Text>}
                   {categoryTotals.map(item => (
                     <View key={item.name} style={styles.reportRow}>
@@ -895,9 +895,9 @@ export default function App() {
             {visibleTab === 'settings' && (
               <>
                 <Text style={styles.kicker}>JUGAAD ZONE</Text>
-                <Text style={styles.title}>Jugaad</Text>
+                <Text style={styles.title}>⚙️ Jugaad</Text>
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>Salary ka Jugaad</Text>
+                  <Text style={styles.sectionTitle}>💰 Salary ka Jugaad</Text>
                   <Text style={styles.formHint}>Monthly salary set karo. Spending is month ke total se compare hoga.</Text>
                   <View style={styles.salaryEditRow}>
                     <TextInput value={salaryDraft} onChangeText={setSalaryDraft} keyboardType="decimal-pad" placeholder="Monthly salary" placeholderTextColor={colors.dim} style={styles.input} />
@@ -941,7 +941,7 @@ export default function App() {
             ['reports', 'Hisaab'],
             ['settings', 'Jugaad'],
           ] as const).map(([key, label]) => (
-            <TouchableOpacity key={key} onPress={() => setTab(key)} style={styles.navItem}>
+            <TouchableOpacity key={key} accessibilityRole="tab" accessibilityLabel={label} accessibilityState={{ selected: tab === key }} onPress={() => setTab(key)} style={styles.navItem}>
               <SvgIcon
                 xml={{ today: ICON_HOME, history: ICON_HISTORY, reports: ICON_REPORTS, settings: ICON_SETTINGS }[key]}
                 size={20}
@@ -952,6 +952,31 @@ export default function App() {
           ))}
         </View>
 
+        {deleteCandidate && (
+          <View style={styles.modalBackdrop}>
+            <View style={styles.confirmModal}>
+              <View style={styles.modalHandle} />
+              <Text style={styles.confirmEmoji}>🧾</Text>
+              <Text style={styles.confirmTitle}>Evidence delete karein?</Text>
+              <Text style={styles.confirmCopy}>{deleteCandidate.description} • {currency(deleteCandidate.amount)}{`\n`}Ye entry wapas nahi aayegi.</Text>
+              <View style={styles.modalActions}>
+                <TouchableOpacity onPress={() => setDeleteCandidate(null)} style={styles.secondaryButton}>
+                  <Text style={styles.secondaryText}>Rehne de</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={confirmDeleteExpense} style={styles.dangerButton}>
+                  <Text style={styles.primaryText}>Haan, delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {toast && (
+          <Animated.View pointerEvents="none" style={[styles.toast, { opacity: toastOpacity, transform: [{ translateY: toastY }] }]}> 
+            <Text style={styles.toastText}>{toast}</Text>
+          </Animated.View>
+        )}
+
         {quickEntry && (
           <View style={styles.modalBackdrop}>
             <KeyboardAvoidingView
@@ -959,6 +984,7 @@ export default function App() {
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               keyboardVerticalOffset={0}
             >
+            <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={styles.modalScrollContent}>
             <View style={styles.modal}>
               <View style={styles.modalHandle} />
               <Text style={styles.title}>Jaldi se daal</Text>
@@ -969,6 +995,7 @@ export default function App() {
                 <TouchableOpacity onPress={addQuickExpenses} style={styles.primaryButton}><Text style={styles.primaryText}>Add all</Text><SvgIcon xml={ICON_ADD} size={18} color={colors.white} /></TouchableOpacity>
               </View>
             </View>
+            </ScrollView>
             </KeyboardAvoidingView>
           </View>
         )}
@@ -1102,6 +1129,14 @@ const styles = StyleSheet.create({
   modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(2,3,7,0.82)', justifyContent: 'flex-end' },
   modalKeyboard: { width: '100%' },
   modal: { backgroundColor: '#16090C', padding: 22, borderTopLeftRadius: 27, borderTopRightRadius: 27, borderWidth: 1, borderColor: colors.border, gap: 13 },
+  modalScrollContent: { flexGrow: 1, justifyContent: 'flex-end' },
+  confirmModal: { backgroundColor: '#16090C', padding: 22, borderTopLeftRadius: 27, borderTopRightRadius: 27, borderWidth: 1, borderColor: colors.border, gap: 10 },
+  confirmEmoji: { fontSize: 27 },
+  confirmTitle: { color: colors.text, fontSize: 22, fontWeight: '900' },
+  confirmCopy: { color: colors.muted, fontSize: 13, lineHeight: 20 },
+  dangerButton: { flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: colors.maroon, alignItems: 'center', justifyContent: 'center' },
+  toast: { position: 'absolute', left: 18, right: 18, bottom: 76, minHeight: 50, paddingHorizontal: 15, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.red, alignItems: 'center', justifyContent: 'center', elevation: 8, shadowColor: '#000000', shadowOpacity: 0.28, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } },
+  toastText: { color: '#1A090D', fontSize: 12.5, fontWeight: '900', textAlign: 'center' },
   modalHandle: { width: 42, height: 4, borderRadius: 2, backgroundColor: '#62333B', alignSelf: 'center', marginBottom: 2 },
   quickInput: { minHeight: 125, textAlignVertical: 'top' },
   modalActions: { flexDirection: 'row', gap: 10 },
