@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Animated, Easing, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Animated, Easing, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 import { StatusBar } from 'expo-status-bar'
 
@@ -119,6 +119,7 @@ export default function App() {
   const todayKey = dateKey(today)
 
   const [tab, setTab] = useState<Tab>('today')
+  const [visibleTab, setVisibleTab] = useState<Tab>('today')
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
@@ -132,6 +133,9 @@ export default function App() {
 
   const screenOpacity = useRef(new Animated.Value(1)).current
   const screenY = useRef(new Animated.Value(0)).current
+  const screenX = useRef(new Animated.Value(0)).current
+  const scrollRef = useRef<ScrollView | null>(null)
+  const firstTabRender = useRef(true)
   const welcomeOpacity = useRef(new Animated.Value(0)).current
   const welcomeY = useRef(new Animated.Value(28)).current
   const orbScale = useRef(new Animated.Value(0.9)).current
@@ -171,6 +175,11 @@ export default function App() {
         if (gaaliModeSaved !== null) setGaaliMode(gaaliModeSaved === 'true')
         setWelcomeVisible(welcomeSeen !== 'true')
         if (!welcomeSeenNew && welcomeSeenLegacy === 'true') AsyncStorage.setItem(WELCOME_KEY, 'true').catch(() => {})
+      } catch {
+        if (mounted) {
+          Alert.alert('Storage error', 'Saved expenses could not be loaded. Your existing entries have not been changed.')
+          setWelcomeVisible(true)
+        }
       } finally {
         if (mounted) setStorageReady(true)
       }
@@ -180,27 +189,56 @@ export default function App() {
 
   useEffect(() => {
     if (!storageReady) return
-    AsyncStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses)).catch(() => {})
+    AsyncStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses)).catch(() => {
+      Alert.alert('Storage error', 'Your latest expense could not be saved locally.')
+    })
   }, [expenses, storageReady])
 
   useEffect(() => {
     if (!storageReady) return
-    AsyncStorage.setItem(REMINDERS_KEY, String(reminders)).catch(() => {})
+    AsyncStorage.setItem(REMINDERS_KEY, String(reminders)).catch(() => {
+      Alert.alert('Storage error', 'Your reminder setting could not be saved locally.')
+    })
   }, [reminders, storageReady])
 
   useEffect(() => {
     if (!storageReady) return
-    AsyncStorage.setItem(GAALI_MODE_KEY, String(gaaliMode)).catch(() => {})
+    AsyncStorage.setItem(GAALI_MODE_KEY, String(gaaliMode)).catch(() => {
+      Alert.alert('Storage error', 'Gaali Mode setting could not be saved locally.')
+    })
   }, [gaaliMode, storageReady])
 
   useEffect(() => {
-    screenOpacity.setValue(0)
-    screenY.setValue(10)
+    if (firstTabRender.current) {
+      firstTabRender.current = false
+      return
+    }
+
+    let cancelled = false
+    screenOpacity.stopAnimation()
+    screenY.stopAnimation()
+    screenX.stopAnimation()
+
     Animated.parallel([
-      Animated.timing(screenOpacity, { toValue: 1, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      Animated.timing(screenY, { toValue: 0, duration: 360, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-    ]).start()
-  }, [tab, screenOpacity, screenY])
+      Animated.timing(screenOpacity, { toValue: 0, duration: 150, easing: Easing.in(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(screenX, { toValue: -10, duration: 170, easing: Easing.in(Easing.cubic), useNativeDriver: true }),
+    ]).start(({ finished }) => {
+      if (!finished || cancelled) return
+      setVisibleTab(tab)
+      screenY.setValue(7)
+      screenX.setValue(10)
+      Animated.parallel([
+        Animated.timing(screenOpacity, { toValue: 1, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(screenY, { toValue: 0, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(screenX, { toValue: 0, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      ]).start()
+      scrollRef.current?.scrollTo({ y: 0, animated: true })
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [tab, screenOpacity, screenY, screenX])
 
   useEffect(() => {
     if (!welcomeVisible) return
@@ -252,7 +290,10 @@ export default function App() {
 
   const addExpense = () => {
     const numericAmount = Number(amount)
-    if (!description.trim() || !Number.isFinite(numericAmount) || numericAmount <= 0) return
+    if (!description.trim() || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+      Alert.alert('Check your entry', 'Add a description and an amount greater than ₹0.')
+      return
+    }
     setExpenses(current => [{
       id: Date.now(),
       description: description.trim(),
@@ -273,7 +314,10 @@ export default function App() {
       const match = entry.match(/^(.*?)[\s-:–—]*(\d+(?:\.\d{1,2})?)$/)
       return match ? { description: match[1].trim(), amount: Number(match[2]) } : null
     })
-    if (!parsed.length || parsed.some(item => !item?.description || !item.amount)) return
+    if (!parsed.length || parsed.some(item => !item?.description || !item.amount)) {
+      Alert.alert('Could not read entries', 'Use a format like Lunch 250, one expense per line.')
+      return
+    }
     setExpenses(current => [
       ...parsed.map((item, i) => ({ id: Date.now() + i, description: item!.description, amount: item!.amount, category: 'Other', date: todayKey })),
       ...current,
@@ -361,9 +405,19 @@ export default function App() {
           <View style={styles.liveDot} />
         </View>
 
-        <Animated.View style={[styles.screen, { opacity: screenOpacity, transform: [{ translateY: screenY }] }]}>
-          <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-            {tab === 'today' && (
+        <Animated.View style={[styles.screen, { opacity: screenOpacity, transform: [{ translateY: screenY }, { translateX: screenX }] }]}>
+          <ScrollView
+            ref={scrollRef}
+            style={styles.scroll}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            bounces
+            removeClippedSubviews={false}
+          >
+            {visibleTab === 'today' && (
               <>
                 <View style={styles.rowBetween}>
                   <View style={styles.flex}>
@@ -413,7 +467,13 @@ export default function App() {
                   <Text style={styles.formHint}>Bas sach bol. App judge karega, par silently.</Text>
                   <TextInput value={description} onChangeText={setDescription} placeholder="Kis cheez pe udaaya?" placeholderTextColor={colors.dim} style={styles.input} />
                   <TextInput value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="Kitne rupaye?" placeholderTextColor={colors.dim} style={styles.input} />
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.chips}
+                    nestedScrollEnabled
+                    keyboardShouldPersistTaps="handled"
+                  >
                     {categories.map(item => (
                       <TouchableOpacity key={item} onPress={() => setCategory(item)} style={[styles.chip, item === category && styles.chipActive]}>
                         <Text style={[styles.chipText, item === category && styles.chipTextActive]}>{item}</Text>
@@ -427,7 +487,7 @@ export default function App() {
               </>
             )}
 
-            {tab === 'history' && (
+            {visibleTab === 'history' && (
               <>
                 <Text style={styles.kicker}>MONEY TRAIL</Text>
                 <Text style={styles.title}>Kharchon ka Qissa</Text>
@@ -446,7 +506,7 @@ export default function App() {
               </>
             )}
 
-            {tab === 'reports' && (
+            {visibleTab === 'reports' && (
               <>
                 <Text style={styles.kicker}>PAISA KAHAN GAYA?</Text>
                 <Text style={styles.title}>Hisaab</Text>
@@ -467,7 +527,7 @@ export default function App() {
               </>
             )}
 
-            {tab === 'settings' && (
+            {visibleTab === 'settings' && (
               <>
                 <Text style={styles.kicker}>JUGAAD ZONE</Text>
                 <Text style={styles.title}>Jugaad</Text>
