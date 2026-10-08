@@ -110,7 +110,7 @@ const getPunchline = (gaaliMode: boolean, index: number) => {
   return pool[index % pool.length]
 }
 
-const currency = (amount: number) => \`₹\${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}\`
+const currency = (amount: number) => `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
 const dateKey = (date: Date) => date.toISOString().slice(0, 10)
 const readableDate = (date: Date) => date.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' })
 
@@ -379,7 +379,7 @@ export default function App() {
                   <View style={styles.heroGlow} />
                   <Text style={styles.label}>AAJ KITNA UDAA?</Text>
                   <Text style={styles.total}>{currency(total)}</Text>
-                  <Text style={styles.heroSub}>{todayExpenses.length ? \`\${todayExpenses.length} kharcha\${todayExpenses.length === 1 ? '' : 'y'} recorded\` : 'Aaj abhi tak paisa zinda hai. Mashallah.'}</Text>
+                  <Text style={styles.heroSub}>{todayExpenses.length ? `${todayExpenses.length} kharcha${todayExpenses.length === 1 ? '' : 'y'} recorded` : 'Aaj abhi tak paisa zinda hai. Mashallah.'}</Text>
                   <View style={styles.divider} />
                   <Text style={styles.heroHint}>{getPunchline(gaaliMode, todayExpenses.length + expenses.length)}</Text>
                 </View>
@@ -460,7 +460,7 @@ export default function App() {
                   {categoryTotals.map(item => (
                     <View key={item.name} style={styles.reportRow}>
                       <View style={styles.rowBetween}><Text style={styles.expenseName}>{item.name}</Text><Text style={styles.muted}>{currency(item.amount)}</Text></View>
-                      <View style={styles.track}><View style={[styles.fill, { width: \`\${allTotal ? item.amount / allTotal * 100 : 0}%\` }]} /></View>
+                      <View style={styles.track}><View style={[styles.fill, { width: `${allTotal ? item.amount / allTotal * 100 : 0}%` }]} /></View>
                     </View>
                   ))}
                 </View>
