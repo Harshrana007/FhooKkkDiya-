@@ -11,13 +11,14 @@ type Expense = { id: number; amount: number; description: string; category: stri
 
 const EXPENSES_KEY = '@fhookkdiya/expenses'
 const REMINDERS_KEY = '@fhookkdiya/reminders'
+const GAALI_MODE_KEY = '@fhookkdiya/gaali-mode'
 const WELCOME_KEY = '@fhookkdiya/welcome-seen'
 const LEGACY_EXPENSES_KEY = '@spendly/expenses'
 const LEGACY_REMINDERS_KEY = '@spendly/reminders'
 const LEGACY_WELCOME_KEY = '@spendly/welcome-seen'
 
 const categories = ['Food', 'Chai', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Travel', 'Family', 'Other']
-const punchlines = [
+const cleanPunchlines = [
   'Paisa gaya. At least ab pata hai kahan gaya.',
   'Wallet: bhai bas kar. Tu: ek last spend.',
   'Zindagi short hai. Expense list surprisingly long.',
@@ -25,7 +26,47 @@ const punchlines = [
   'Kharcha chhota tha. Bank balance ka reaction bada tha.',
   'Allah jaane paisa kahan jaata hai. FhooKkkDiya jaanta hai.',
   'Kharchon ka hisaab rakho, warna kharchay tumhara hisaab rakh lenge.',
+  'Dekho beta, paisa hawa mein nahi gaya. Tumne hi udaaya hai.',
+  'Jaanne ki koshish karo: paisa gaya kahan? Saboot yahin pada hai.',
+  'Case solved. Culprit: tum.',
 ]
+
+const gaaliPunchlines = [
+  'Abe MC, wallet ko oxygen de de. Har baar shopping pe ghusa deta hai.',
+  'Ye le BC, ek aur expense. Ab report khol ke shayari sun.',
+  'BC, ₹500 ki chai? Bhai chai thi ya IPO?',
+  'MC, ek last spend bol-bol ke poora bazaar khareed liya.',
+  'Wah BC wah. Paisa tha hi kitna jo itne confidence se uda diya?',
+  'Abe kya kar raha hai MC? Salary ko farewell de raha hai kya?',
+  'For fuck\'s sake, kharcha dekh ke calculator bhi resign kar raha hai.',
+  'Well shit. Bank balance ne seen kar diya.',
+  'Chal MC, entry maar. Kal phir bolenge budget kyun toot gaya.',
+  'BC ye expense nahi, emotional damage hai.',
+  'Abe yaar, paisa sambhal le. Tu kharchon ka Ashoka nahi hai.',
+]
+
+const filmyPunchlines = [
+  'Yeh paisa tumse kisne kaha tha ki itna udne ka?',
+  'Aaj hisaab hoga. Drama baad mein.',
+  'Dialogues bahut ho gaye. Ab receipt dikhao.',
+  'Scene simple hai: paisa kam, confidence zyada.',
+  'Picture abhi baaki hai, budget pehle hi over hai.',
+  'Hero tum ho. Villain bank balance hai.',
+  'Entry grand thi. Exit expense ne kar di.',
+]
+
+const cidPunchlines = [
+  'Kuch toh gadbad hai, Daya. Expense list check karo.',
+  'Investigation complete. Paisa missing nahi, kharch hua hai.',
+  'Team, sabse pehle last transaction pe focus karo.',
+  'Case kaafi serious hai. Suspect khud user hai.',
+  'Evidence mil gaya. ₹ amount ne sab bata diya.',
+]
+
+const getPunchline = (gaaliMode: boolean, index: number) => {
+  const pool = gaaliMode ? [...cleanPunchlines, ...gaaliPunchlines, ...filmyPunchlines, ...cidPunchlines] : [...cleanPunchlines, ...filmyPunchlines, ...cidPunchlines]
+  return pool[index % pool.length]
+}
 
 const currency = (amount: number) => \`₹\${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}\`
 const dateKey = (date: Date) => date.toISOString().slice(0, 10)
@@ -43,6 +84,7 @@ export default function App() {
   const [quickEntry, setQuickEntry] = useState(false)
   const [quickText, setQuickText] = useState('')
   const [reminders, setReminders] = useState(true)
+  const [gaaliMode, setGaaliMode] = useState(true)
   const [storageReady, setStorageReady] = useState(false)
   const [welcomeVisible, setWelcomeVisible] = useState(false)
 
@@ -58,9 +100,10 @@ export default function App() {
     let mounted = true
     ;(async () => {
       try {
-        const [savedExpensesNew, savedRemindersNew, welcomeSeenNew, savedExpensesLegacy, savedRemindersLegacy, welcomeSeenLegacy] = await Promise.all([
+        const [savedExpensesNew, savedRemindersNew, gaaliModeSaved, welcomeSeenNew, savedExpensesLegacy, savedRemindersLegacy, welcomeSeenLegacy] = await Promise.all([
           AsyncStorage.getItem(EXPENSES_KEY),
           AsyncStorage.getItem(REMINDERS_KEY),
+          AsyncStorage.getItem(GAALI_MODE_KEY),
           AsyncStorage.getItem(WELCOME_KEY),
           AsyncStorage.getItem(LEGACY_EXPENSES_KEY),
           AsyncStorage.getItem(LEGACY_REMINDERS_KEY),
@@ -83,6 +126,7 @@ export default function App() {
           setReminders(savedReminders === 'true')
           if (savedRemindersNew === null) AsyncStorage.setItem(REMINDERS_KEY, savedReminders).catch(() => {})
         }
+        if (gaaliModeSaved !== null) setGaaliMode(gaaliModeSaved === 'true')
         setWelcomeVisible(welcomeSeen !== 'true')
         if (!welcomeSeenNew && welcomeSeenLegacy === 'true') AsyncStorage.setItem(WELCOME_KEY, 'true').catch(() => {})
       } finally {
@@ -101,6 +145,11 @@ export default function App() {
     if (!storageReady) return
     AsyncStorage.setItem(REMINDERS_KEY, String(reminders)).catch(() => {})
   }, [reminders, storageReady])
+
+  useEffect(() => {
+    if (!storageReady) return
+    AsyncStorage.setItem(GAALI_MODE_KEY, String(gaaliMode)).catch(() => {})
+  }, [gaaliMode, storageReady])
 
   useEffect(() => {
     screenOpacity.setValue(0)
@@ -214,7 +263,7 @@ export default function App() {
           <Animated.View style={[styles.welcomeContent, { opacity: welcomeOpacity, transform: [{ translateY: welcomeY }] }]}>
             <TouchableOpacity onPress={triggerAvatar} activeOpacity={0.9}>
               <Animated.View style={[styles.avatarLargeWrap, { transform: [{ scale: avatarScale }] }]}>
-                <Image source={require('./assets/gutz-avatar.png')} style={styles.avatarLarge} />
+                <SvgXml xml={GUTZ_AVATAR_SVG} width="112" height="112" />
               </Animated.View>
             </TouchableOpacity>
 
@@ -224,6 +273,10 @@ export default function App() {
             <Text style={styles.welcomeCopy}>
               Welcome! Pehle hi bata do, khud ki marzi se aaye ho ya bank balance dekh ke rona aa raha tha?
             </Text>
+            <View style={styles.quoteCard}>
+              <Text style={styles.quoteKicker}>AAGEY KA SAMPLE</Text>
+              <Text style={styles.quoteText}>“BC, paisa toh tha hi nahi... phir yeh expense kaise aa gaya?”</Text>
+            </View>
 
             <View style={styles.pills}>
               {['LOCAL', 'PRIVATE', 'SARCASTIC'].map(label => (
@@ -257,7 +310,7 @@ export default function App() {
       <View style={styles.app}>
         <View style={styles.header}>
           <TouchableOpacity onPress={triggerAvatar} activeOpacity={0.9} style={styles.avatarSmallWrap}>
-            <Image source={require('./assets/gutz-avatar.png')} style={styles.avatarSmall} />
+            <SvgXml xml={GUTZ_AVATAR_SVG} width="46" height="46" />
           </TouchableOpacity>
           <View style={styles.headerCopy}>
             <Text style={styles.kicker}>GUTZ BHOIII • MONEY FILES</Text>
@@ -286,7 +339,7 @@ export default function App() {
                   <Text style={styles.total}>{currency(total)}</Text>
                   <Text style={styles.heroSub}>{todayExpenses.length ? \`\${todayExpenses.length} kharcha\${todayExpenses.length === 1 ? '' : 'y'} recorded\` : 'Aaj abhi tak paisa zinda hai. Mashallah.'}</Text>
                   <View style={styles.divider} />
-                  <Text style={styles.heroHint}>{punchlines[todayExpenses.length % punchlines.length]}</Text>
+                  <Text style={styles.heroHint}>{getPunchline(gaaliMode, todayExpenses.length + expenses.length)}</Text>
                 </View>
 
                 <View style={styles.rowBetween}>
@@ -388,7 +441,7 @@ export default function App() {
                   </View>
                   <View style={styles.divider} />
                   <Text style={styles.sectionTitle}>About FhooKkkDiya</Text>
-                  <Text style={styles.muted}>Private, local aur thoda besharam expense tracker. No account. No bank connection. Sirf sach.</Text>
+                  <Text style={styles.muted}>Private, local aur thoda besharam expense tracker. No account. No bank connection. Sirf sach. Gaali Mode optional hai. Wallet ko tameez se bhi daant sakte ho.</Text>
                 </View>
               </>
             )}
@@ -414,7 +467,7 @@ export default function App() {
             <View style={styles.modal}>
               <View style={styles.modalHandle} />
               <Text style={styles.title}>Jaldi se daal</Text>
-              <Text style={styles.muted}>Ek line mein ek barbaadi. Example: Chai 120</Text>
+              <Text style={styles.muted}>Ek line mein ek barbaadi. Example: Chai 120. Galti se 12000 mat likh dena, hum judge karenge.</Text>
               <TextInput autoFocus multiline value={quickText} onChangeText={setQuickText} placeholder={'Chai 120\nMetro 80'} placeholderTextColor={colors.dim} style={[styles.input, styles.quickInput]} />
               <View style={styles.modalActions}>
                 <TouchableOpacity onPress={() => setQuickEntry(false)} style={styles.secondaryButton}><Text style={styles.secondaryText}>Rehne de</Text></TouchableOpacity>
@@ -456,6 +509,9 @@ const styles = StyleSheet.create({
   orb2: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: colors.mint, opacity: 0.07, left: -140, bottom: -100 },
   welcomeContent: { width: '100%' },
   avatarLargeWrap: { width: 112, height: 112, borderRadius: 56, overflow: 'hidden', borderWidth: 2, borderColor: '#44376C', backgroundColor: '#151925', marginBottom: 18 },
+  quoteCard: { marginTop: 16, padding: 15, borderRadius: 17, backgroundColor: '#0E1118', borderWidth: 1, borderColor: '#2A3040' },
+  quoteKicker: { color: colors.mint, fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginBottom: 7 },
+  quoteText: { color: '#D6D1E8', fontSize: 13.5, lineHeight: 20, fontWeight: '800' },
 
   avatarSmallWrap: { width: 46, height: 46, borderRadius: 23, overflow: 'hidden', borderWidth: 1, borderColor: '#3A315B' },
 
