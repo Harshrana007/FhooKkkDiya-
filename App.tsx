@@ -553,6 +553,23 @@ export default function App() {
     [expenses],
   )
 
+  const showToast = (message: string) => {
+    setToast(message)
+    toastY.setValue(12)
+    toastOpacity.setValue(0)
+    Animated.parallel([
+      Animated.spring(toastY, { toValue: 0, friction: 8, tension: 90, useNativeDriver: true }),
+      Animated.timing(toastOpacity, { toValue: 1, duration: 160, useNativeDriver: true }),
+    ]).start(() => {
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(toastOpacity, { toValue: 0, duration: 180, useNativeDriver: true }),
+          Animated.timing(toastY, { toValue: 10, duration: 180, useNativeDriver: true }),
+        ]).start(() => setToast(''))
+      }, 1600)
+    })
+  }
+
   const saveSalary = (raw: string) => {
     const value = Number(raw)
     if (!Number.isFinite(value) || value <= 0) {
@@ -561,13 +578,18 @@ export default function App() {
     }
     setSalary(value)
     setSalaryDraft(String(value))
+    showToast('💰 Salary locked in. Ab hisaab hoga.')
     return true
   }
 
   const addExpense = () => {
     const numericAmount = Number(amount)
     if (!description.trim() || !Number.isFinite(numericAmount) || numericAmount <= 0) {
-      Alert.alert('Check your entry', 'Add a description and an amount greater than ₹0.')
+      Alert.alert('Entry adhuri hai', 'Description aur ₹1 se zyada amount daalo.')
+      return
+    }
+    if (numericAmount > MAX_EXPENSE) {
+      Alert.alert('Bhai ruk 😭', 'Per expense max ₹20,000 hai. Isse zyada ko split kar de.')
       return
     }
     setExpenses(current => [{
@@ -579,10 +601,14 @@ export default function App() {
     }, ...current])
     setDescription('')
     setAmount('')
+    showToast('✅ Expense saved. Wallet ki FIR filed.')
   }
 
-  const deleteExpense = (id: number) => {
-    setExpenses(current => current.filter(e => e.id !== id))
+  const confirmDeleteExpense = () => {
+    if (!deleteCandidate) return
+    setExpenses(current => current.filter(e => e.id !== deleteCandidate.id))
+    showToast('🗑️ Expense deleted. Evidence removed.')
+    setDeleteCandidate(null)
   }
 
   const addQuickExpenses = () => {
@@ -773,7 +799,7 @@ export default function App() {
                   </View>
                 ) : (
                   todayExpenses.map(expense => (
-                    <TouchableOpacity key={expense.id} activeOpacity={0.86} onLongPress={() => deleteExpense(expense.id)} style={styles.expenseRow}>
+                    <TouchableOpacity key={expense.id} activeOpacity={0.86} onLongPress={() => setDeleteCandidate(expense)} style={styles.expenseRow}>
                       <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.mint} /></View>
                       <View style={styles.expenseCopy}>
                         <Text style={styles.expenseName}>{expense.description}</Text>
