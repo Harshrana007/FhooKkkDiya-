@@ -52,12 +52,10 @@ type Tab = 'today' | 'history' | 'reports' | 'settings'
 type Expense = { id: number; amount: number; description: string; category: string; date: string }
 
 const EXPENSES_KEY = '@fhookkdiya/expenses'
-const REMINDERS_KEY = '@fhookkdiya/reminders'
 const GAALI_MODE_KEY = '@fhookkdiya/gaali-mode'
 const WELCOME_KEY = '@fhookkdiya/welcome-seen'
 const SALARY_KEY = '@fhookkdiya/monthly-salary'
 const LEGACY_EXPENSES_KEY = '@spendly/expenses'
-const LEGACY_REMINDERS_KEY = '@spendly/reminders'
 const LEGACY_WELCOME_KEY = '@spendly/welcome-seen'
 
 const MAX_EXPENSE = 20000
@@ -358,7 +356,6 @@ export default function App() {
   const [category, setCategory] = useState('Food')
   const [quickEntry, setQuickEntry] = useState(false)
   const [quickText, setQuickText] = useState('')
-  const [reminders, setReminders] = useState(true)
   const [gaaliMode, setGaaliMode] = useState(true)
   const [storageReady, setStorageReady] = useState(false)
   const [welcomeVisible, setWelcomeVisible] = useState(false)
@@ -385,18 +382,15 @@ export default function App() {
     let mounted = true
     ;(async () => {
       try {
-        const [savedExpensesNew, savedRemindersNew, gaaliModeSaved, welcomeSeenNew, savedSalary, savedExpensesLegacy, savedRemindersLegacy, welcomeSeenLegacy] = await Promise.all([
+        const [savedExpensesNew, gaaliModeSaved, welcomeSeenNew, savedSalary, savedExpensesLegacy, welcomeSeenLegacy] = await Promise.all([
           AsyncStorage.getItem(EXPENSES_KEY),
-          AsyncStorage.getItem(REMINDERS_KEY),
           AsyncStorage.getItem(GAALI_MODE_KEY),
           AsyncStorage.getItem(WELCOME_KEY),
           AsyncStorage.getItem(SALARY_KEY),
           AsyncStorage.getItem(LEGACY_EXPENSES_KEY),
-          AsyncStorage.getItem(LEGACY_REMINDERS_KEY),
           AsyncStorage.getItem(LEGACY_WELCOME_KEY),
         ])
         const savedExpenses = savedExpensesNew ?? savedExpensesLegacy
-        const savedReminders = savedRemindersNew ?? savedRemindersLegacy
         const welcomeSeen = welcomeSeenNew ?? welcomeSeenLegacy
         if (!mounted) return
         if (savedExpenses) {
@@ -407,10 +401,6 @@ export default function App() {
               AsyncStorage.setItem(EXPENSES_KEY, JSON.stringify(parsed)).catch(() => {})
             }
           }
-        }
-        if (savedReminders !== null) {
-          setReminders(savedReminders === 'true')
-          if (savedRemindersNew === null) AsyncStorage.setItem(REMINDERS_KEY, savedReminders).catch(() => {})
         }
         if (gaaliModeSaved !== null) setGaaliMode(gaaliModeSaved === 'true')
         if (savedSalary !== null) {
@@ -440,13 +430,6 @@ export default function App() {
       Alert.alert('Storage error', 'Your latest expense could not be saved locally.')
     })
   }, [expenses, storageReady])
-
-  useEffect(() => {
-    if (!storageReady) return
-    AsyncStorage.setItem(REMINDERS_KEY, String(reminders)).catch(() => {
-      Alert.alert('Storage error', 'Your reminder setting could not be saved locally.')
-    })
-  }, [reminders, storageReady])
 
   useEffect(() => {
     if (!storageReady) return
@@ -574,7 +557,7 @@ export default function App() {
   }
 
   const saveSalary = (raw: string) => {
-    const value = Number(raw)
+    const value = Number(raw.replace(/,/g, ''))
     if (!Number.isFinite(value) || value <= 0) {
       Alert.alert('Salary check', 'Enter a monthly salary greater than ₹0.')
       return false
@@ -586,7 +569,7 @@ export default function App() {
   }
 
   const addExpense = () => {
-    const numericAmount = Number(amount)
+    const numericAmount = Number(amount.replace(/,/g, ''))
     if (!description.trim() || !Number.isFinite(numericAmount) || numericAmount <= 0) {
       Alert.alert('Entry adhuri hai', 'Description aur ₹1 se zyada amount daalo.')
       return
@@ -616,8 +599,8 @@ export default function App() {
 
   const addQuickExpenses = () => {
     const parsed = quickText.split(/[\n,]+/).map(s => s.trim()).filter(Boolean).map(entry => {
-      const match = entry.match(/^(.*?)[\s-:–—]*(\d+(?:\.\d{1,2})?)$/)
-      return match ? { description: match[1].trim(), amount: Number(match[2]) } : null
+      const match = entry.match(/^(.*?)[\s-:–—]*([\d,]+(?:\.\d{1,2})?)$/)
+      return match ? { description: match[1].trim(), amount: Number(match[2].replace(/,/g, '')) } : null
     })
     if (!parsed.length || parsed.some(item => !item?.description || !item.amount)) {
       Alert.alert('Format samajh nahi aaya', 'Use: Lunch 250, one expense per line.')
@@ -643,7 +626,7 @@ export default function App() {
         <View style={styles.boot}>
           <View style={styles.logoMark}><SvgIcon xml={ICON_MONEY} size={30} color={colors.white} /></View>
           <Text style={styles.bootTitle}>FhooKkkDiya</Text>
-          <Text style={styles.bootCopy}>Paisa ka post-mortem set ho raha hai...</Text>
+          <Text style={styles.bootCopy}>Paisa ka post-mortem loading...</Text>
         </View>
       </SafeAreaView>
     )
@@ -678,6 +661,7 @@ export default function App() {
                 value={salaryDraft}
                 onChangeText={setSalaryDraft}
                 keyboardType="decimal-pad"
+                maxLength={10}
                 placeholder="Monthly salary e.g. 50000"
                 placeholderTextColor={colors.dim}
                 style={styles.salarySetupInput}
@@ -830,8 +814,8 @@ export default function App() {
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>💸 Kharcha chipka</Text>
                   <Text style={styles.formHint}>Bas sach bol. App judge karega, par silently.</Text>
-                  <TextInput value={description} onChangeText={setDescription} placeholder="Kis cheez pe udaaya?" placeholderTextColor={colors.dim} style={styles.input} />
-                  <TextInput value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="Kitne rupaye?" placeholderTextColor={colors.dim} style={styles.input} />
+                  <TextInput value={description} onChangeText={setDescription} placeholder="Kis cheez pe udaaya?" placeholderTextColor={colors.dim} maxLength={60} style={styles.input} />
+                  <TextInput value={amount} onChangeText={setAmount} keyboardType="decimal-pad" maxLength={8} placeholder="Kitne rupaye?" placeholderTextColor={colors.dim} style={styles.input} />
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -904,16 +888,6 @@ export default function App() {
                     <TouchableOpacity onPress={() => saveSalary(salaryDraft)} style={styles.salarySaveButton}><Text style={styles.primaryText}>Save</Text></TouchableOpacity>
                   </View>
                   <Text style={styles.muted}>{salary > 0 ? `Current: ${currency(salary)} • ${currency(monthTotal)} spent this month` : 'Not set yet.'}</Text>
-                  <View style={styles.divider} />
-                  <View style={styles.rowBetween}>
-                    <View style={styles.flex}>
-                      <Text style={styles.expenseName}>Roz ka hisaab</Text>
-                      <Text style={styles.muted}>Shaam ko yaad dilaana ke paisa phir udd gaya.</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => setReminders(v => !v)} style={[styles.toggle, reminders && styles.toggleOn]}>
-                      <View style={[styles.knob, reminders && styles.knobOn]} />
-                    </TouchableOpacity>
-                  </View>
                   <View style={styles.divider} />
                   <View style={styles.rowBetween}>
                     <View style={styles.flex}>
