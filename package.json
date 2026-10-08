@@ -23,7 +23,9 @@
   "devDependencies": {
     "@babel/core": "^7.24.0",
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "@types/react": "18.2.79",
+    "@types/react-dom": "18.2.25"
   },
   "private": true,
   "description": "Local-first Gen-Z expense tracker with salary-aware spending, Indian meme reactions and optional Gaali Mode.",
