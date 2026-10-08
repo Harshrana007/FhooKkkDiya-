@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   static-qa:
     runs-on: ubuntu-latest
@@ -23,7 +27,28 @@ jobs:
         run: npx expo config --type public > /dev/null
 
       - name: Expo web bundle smoke test
-        run: npx expo export --platform web > /dev/null
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          npx expo export --platform web > expo-export.log 2>&1
+          status=$?
+          if [ $status -ne 0 ]; then
+            {
+              echo "## Expo web export failure"
+              echo
+              echo "- Run: $GITHUB_RUN_ID"
+              echo "- Commit: $GITHUB_SHA"
+              echo
+              echo '```text'
+              cat expo-export.log
+              echo '```'
+            } > expo-export-diagnostic.md
+            gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body-file expo-export-diagnostic.md
+            cat expo-export.log
+            exit $status
+          fi
+          cat expo-export.log
 
       - name: Parse TypeScript source
         run: npx prettier@3 App.tsx --parser typescript > /dev/null
