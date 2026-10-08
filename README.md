@@ -142,12 +142,15 @@ npx eas-cli@latest build -p android --profile production
 
 The EAS profiles currently target Node 20.18.0.
 
+Android application id: `com.gutzx007s.fhookkkdiya`.
+
 ## QA
 
 Automated product assertions live in:
 
 ```
 qa/static-qa.mjs
+qa/dependency-audit.mjs
 ```
 
 GitHub Actions runs:
@@ -155,7 +158,8 @@ GitHub Actions runs:
 1. dependency installation
 2. Prettier source/config check
 3. JSON validation
-4. product-level static assertions
+4. explicit dependency compatibility audit
+5. product-level static assertions
 
 The QA assertions cover:
 - stale dependency/config cleanup
