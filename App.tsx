@@ -8,7 +8,7 @@ const GUTZ_AVATAR_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0
 
 const svgWithColor = (xml: string, color: string) => xml.replace(/CURRENT_COLOR/g, color)
 
-const SvgIcon = ({ xml, size = 20, color = '#61687A' }: { xml: string; size?: number; color?: string }) => (
+const SvgIcon = ({ xml, size = 20, color = '#7E686C' }: { xml: string; size?: number; color?: string }) => (
   <SvgXml xml={svgWithColor(xml, color)} width={size} height={size} />
 )
 
@@ -817,7 +817,7 @@ export default function App() {
                 ) : (
                   todayExpenses.map(expense => (
                     <TouchableOpacity key={expense.id} activeOpacity={0.86} onLongPress={() => setDeleteCandidate(expense)} style={styles.expenseRow}>
-                      <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.mint} /></View>
+                      <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.red} /></View>
                       <View style={styles.expenseCopy}>
                         <Text style={styles.expenseName}>{expense.description}</Text>
                         <Text style={styles.muted}>{expense.category} • long press = delete</Text>
@@ -862,7 +862,7 @@ export default function App() {
                 </View>
                 {expenses.map(expense => (
                   <TouchableOpacity key={expense.id} onLongPress={() => deleteExpense(expense.id)} style={styles.expenseRow}>
-                    <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.mint} /></View>
+                    <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.red} /></View>
                     <View style={styles.expenseCopy}><Text style={styles.expenseName}>{expense.description}</Text><Text style={styles.muted}>{expense.category} • {expense.date}</Text></View>
                     <Text style={styles.expenseAmount}>{currency(expense.amount)}</Text>
                   </TouchableOpacity>
@@ -945,7 +945,7 @@ export default function App() {
               <SvgIcon
                 xml={{ today: ICON_HOME, history: ICON_HISTORY, reports: ICON_REPORTS, settings: ICON_SETTINGS }[key]}
                 size={20}
-                color={tab === key ? colors.purple : colors.dim}
+                color={tab === key ? colors.red : colors.dim}
               />
               <Text style={[styles.navLabel, tab === key && styles.active]}>{label}</Text>
             </TouchableOpacity>
@@ -978,16 +978,17 @@ export default function App() {
 }
 
 const colors = {
-  bg: '#07080B',
-  surface: '#0E1118',
-  surface2: '#121621',
-  border: '#202636',
-  text: '#F7F8FC',
-  muted: '#8C93A3',
-  dim: '#62697A',
-  purple: '#9B7CFF',
-  purpleSoft: '#201A35',
-  mint: '#4CE1B6',
+  bg: '#080506',
+  surface: '#120A0C',
+  surface2: '#1A0D10',
+  border: '#3A1D22',
+  text: '#FFF8F6',
+  muted: '#B99FA2',
+  dim: '#7E686C',
+  red: '#E5384F',
+  redSoft: '#3A1118',
+  maroon: '#6E1C2A',
+  maroonDeep: '#350D15',
   white: '#FFFFFF',
 }
 
@@ -997,113 +998,113 @@ const styles = StyleSheet.create({
   boot: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
   bootTitle: { marginTop: 14, color: colors.text, fontSize: 25, fontWeight: '900' },
   bootCopy: { marginTop: 7, color: colors.muted, fontSize: 13 },
-  logoMark: { width: 62, height: 62, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.purple },
+  logoMark: { width: 62, height: 62, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.red },
   logoText: { color: colors.white, fontSize: 29, fontWeight: '900' },
 
   welcomeScreen: { flex: 1, justifyContent: 'center', padding: 25, overflow: 'hidden', backgroundColor: colors.bg },
-  orb: { position: 'absolute', width: 340, height: 340, borderRadius: 170, backgroundColor: colors.purple, opacity: 0.12, right: -130, top: -110 },
-  orb2: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: colors.mint, opacity: 0.07, left: -140, bottom: -100 },
+  orb: { position: 'absolute', width: 340, height: 340, borderRadius: 170, backgroundColor: colors.red, opacity: 0.12, right: -130, top: -110 },
+  orb2: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: colors.red, opacity: 0.07, left: -140, bottom: -100 },
   welcomeKeyboard: { flex: 1, width: '100%' },
   welcomeScrollContent: { flexGrow: 1, justifyContent: 'center', paddingVertical: 12 },
   welcomeContent: { width: '100%' },
-  avatarLargeWrap: { width: 112, height: 112, borderRadius: 56, overflow: 'hidden', borderWidth: 2, borderColor: '#44376C', backgroundColor: '#151925', marginBottom: 18 },
-  quoteCard: { marginTop: 16, padding: 15, borderRadius: 17, backgroundColor: '#0E1118', borderWidth: 1, borderColor: '#2A3040' },
-  quoteKicker: { color: colors.mint, fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginBottom: 7 },
-  quoteText: { color: '#D6D1E8', fontSize: 13.5, lineHeight: 20, fontWeight: '800' },
-  salarySetupInput: { marginTop: 12, borderRadius: 13, borderWidth: 1, borderColor: colors.border, backgroundColor: '#0A0D13', color: colors.text, paddingHorizontal: 13, paddingVertical: 12, fontSize: 14, fontWeight: '800' },
+  avatarLargeWrap: { width: 112, height: 112, borderRadius: 56, overflow: 'hidden', borderWidth: 2, borderColor: '#69202C', backgroundColor: '#170B0E', marginBottom: 18 },
+  quoteCard: { marginTop: 16, padding: 15, borderRadius: 17, backgroundColor: '#0E1118', borderWidth: 1, borderColor: '#462329' },
+  quoteKicker: { color: colors.red, fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginBottom: 7 },
+  quoteText: { color: '#F3DDE1', fontSize: 13.5, lineHeight: 20, fontWeight: '800' },
+  salarySetupInput: { marginTop: 12, borderRadius: 13, borderWidth: 1, borderColor: colors.border, backgroundColor: '#0B0709', color: colors.text, paddingHorizontal: 13, paddingVertical: 12, fontSize: 14, fontWeight: '800' },
   presetRow: { flexDirection: 'row', gap: 7, marginTop: 9, flexWrap: 'wrap' },
-  presetChip: { paddingHorizontal: 9, paddingVertical: 7, borderRadius: 10, backgroundColor: '#151923', borderWidth: 1, borderColor: colors.border },
-  presetChipText: { color: '#B9B0DC', fontSize: 10, fontWeight: '900' },
+  presetChip: { paddingHorizontal: 9, paddingVertical: 7, borderRadius: 10, backgroundColor: '#1A0D10', borderWidth: 1, borderColor: colors.border },
+  presetChipText: { color: '#F1B1B9', fontSize: 10, fontWeight: '900' },
   salaryOptional: { color: colors.dim, fontSize: 10, marginTop: 9 },
 
-  avatarSmallWrap: { width: 46, height: 46, borderRadius: 23, overflow: 'hidden', borderWidth: 1, borderColor: '#3A315B' },
+  avatarSmallWrap: { width: 46, height: 46, borderRadius: 23, overflow: 'hidden', borderWidth: 1, borderColor: '#5A1C27' },
 
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 21, paddingTop: 15, paddingBottom: 11 },
   headerCopy: { flex: 1, marginLeft: 11 },
-  kicker: { color: '#7B8292', fontSize: 9, letterSpacing: 1.5, fontWeight: '900' },
+  kicker: { color: '#9A7E83', fontSize: 9, letterSpacing: 1.5, fontWeight: '900' },
   brand: { color: colors.text, fontSize: 22, fontWeight: '900', marginTop: 2 },
-  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.mint },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.red },
   content: { padding: 21, paddingBottom: 30, gap: 17 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   flex: { flex: 1 },
   title: { color: colors.text, fontSize: 29, lineHeight: 34, fontWeight: '900', letterSpacing: -0.8, marginTop: 5 },
   welcomeTitle: { color: colors.text, fontSize: 42, lineHeight: 46, fontWeight: '900', letterSpacing: -1.4 },
-  welcomeAccent: { color: '#C9BCFF', fontSize: 24, lineHeight: 30, fontWeight: '800', marginTop: 3 },
+  welcomeAccent: { color: '#FFB7C0', fontSize: 24, lineHeight: 30, fontWeight: '800', marginTop: 3 },
   welcomeCopy: { color: colors.muted, fontSize: 15, lineHeight: 23, marginTop: 16, maxWidth: 420 },
   pills: { flexDirection: 'row', gap: 8, marginTop: 21, marginBottom: 27 },
   pill: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: 20, backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.border },
-  pillText: { color: '#AAB0BF', fontSize: 9, fontWeight: '900', letterSpacing: 1.1 },
-  enterButton: { minHeight: 58, borderRadius: 18, backgroundColor: colors.purple, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 19 },
+  pillText: { color: '#C5AEB1', fontSize: 9, fontWeight: '900', letterSpacing: 1.1 },
+  enterButton: { minHeight: 58, borderRadius: 18, backgroundColor: colors.red, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 19 },
   enterText: { color: colors.white, fontSize: 15, fontWeight: '900' },
   enterArrow: { color: colors.white, fontSize: 22, fontWeight: '900' },
-  welcomeFoot: { textAlign: 'center', color: '#555D6C', fontSize: 11, marginTop: 13 },
+  welcomeFoot: { textAlign: 'center', color: '#725D62', fontSize: 11, marginTop: 13 },
 
   quickButton: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  quickText: { color: '#C1B2FF', fontSize: 12, fontWeight: '900' },
-  salaryCard: { backgroundColor: '#0C1115', borderRadius: 22, padding: 17, borderWidth: 1, borderColor: '#20352F', gap: 13 },
+  quickText: { color: '#FF9BA8', fontSize: 12, fontWeight: '900' },
+  salaryCard: { backgroundColor: '#13090C', borderRadius: 22, padding: 17, borderWidth: 1, borderColor: '#4D2028', gap: 13 },
   salaryBig: { color: colors.text, fontSize: 27, fontWeight: '900', marginTop: 4 },
-  salaryBadge: { width: 58, height: 58, borderRadius: 18, backgroundColor: '#15271F', borderWidth: 1, borderColor: '#2B5D4C', alignItems: 'center', justifyContent: 'center' },
-  salaryBadgeNum: { color: colors.mint, fontSize: 15, fontWeight: '900' },
-  salaryBadgeLabel: { color: '#6C8E80', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
+  salaryBadge: { width: 58, height: 58, borderRadius: 18, backgroundColor: '#251015', borderWidth: 1, borderColor: '#6B2532', alignItems: 'center', justifyContent: 'center' },
+  salaryBadgeNum: { color: colors.red, fontSize: 15, fontWeight: '900' },
+  salaryBadgeLabel: { color: '#9D7179', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
   salaryStats: { flexDirection: 'row', gap: 9 },
   salaryStat: { flex: 1, padding: 11, borderRadius: 14, backgroundColor: '#0A0F0D', borderWidth: 1, borderColor: '#1A2B25' },
   salaryStatLabel: { color: '#6F877D', fontSize: 8, fontWeight: '900', letterSpacing: 1.2 },
-  salaryStatValue: { color: '#E5F7F0', fontSize: 15, fontWeight: '900', marginTop: 4 },
-  salaryDanger: { color: '#FF8A8A' },
-  salaryTrack: { height: 7, borderRadius: 5, overflow: 'hidden', backgroundColor: '#18201D' },
-  salaryFill: { height: 7, borderRadius: 5, backgroundColor: colors.mint },
-  salaryHint: { color: '#7D9189', fontSize: 10.5, lineHeight: 16 },
+  salaryStatValue: { color: '#FFF1F2', fontSize: 15, fontWeight: '900', marginTop: 4 },
+  salaryDanger: { color: '#FF8794' },
+  salaryTrack: { height: 7, borderRadius: 5, overflow: 'hidden', backgroundColor: '#241014' },
+  salaryFill: { height: 7, borderRadius: 5, backgroundColor: colors.red },
+  salaryHint: { color: '#A98188', fontSize: 10.5, lineHeight: 16 },
   salaryEditRow: { flexDirection: 'row', gap: 9, alignItems: 'center' },
-  salarySaveButton: { minHeight: 48, paddingHorizontal: 17, borderRadius: 13, backgroundColor: colors.purple, alignItems: 'center', justifyContent: 'center' },
+  salarySaveButton: { minHeight: 48, paddingHorizontal: 17, borderRadius: 13, backgroundColor: colors.red, alignItems: 'center', justifyContent: 'center' },
   hero: { position: 'relative', overflow: 'hidden', backgroundColor: colors.surface2, borderRadius: 25, padding: 22, borderWidth: 1, borderColor: '#282F40' },
-  heroGlow: { position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: colors.purple, opacity: 0.1, right: -70, top: -80 },
-  label: { color: '#848B9B', fontSize: 9, fontWeight: '900', letterSpacing: 1.6 },
+  heroGlow: { position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: colors.red, opacity: 0.1, right: -70, top: -80 },
+  label: { color: '#9B7D83', fontSize: 9, fontWeight: '900', letterSpacing: 1.6 },
   total: { color: colors.text, fontSize: 43, fontWeight: '900', letterSpacing: -1.3, marginVertical: 7 },
-  heroSub: { color: '#A1A8B7', fontSize: 13 },
+  heroSub: { color: '#C4A9AE', fontSize: 13 },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: 17 },
-  heroHint: { color: '#8D95A6', fontSize: 11, fontWeight: '800' },
+  heroHint: { color: '#B79AA0', fontSize: 11, fontWeight: '800' },
   sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '900' },
   muted: { color: colors.muted, fontSize: 12.5, lineHeight: 19 },
-  empty: { alignItems: 'center', paddingVertical: 30, borderRadius: 20, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.border, backgroundColor: '#090C11' },
-  emptyBig: { color: '#B8ACFF', fontSize: 30, fontWeight: '900' },
+  empty: { alignItems: 'center', paddingVertical: 30, borderRadius: 20, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.border, backgroundColor: '#0B0608' },
+  emptyBig: { color: '#FF6B7C', fontSize: 30, fontWeight: '900' },
   emptyTitle: { color: colors.text, marginTop: 7, marginBottom: 4, fontWeight: '900' },
   expenseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 7 },
   expenseIcon: { width: 41, height: 41, borderRadius: 13, backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
-  expenseIconText: { color: colors.mint, fontWeight: '900' },
+  expenseIconText: { color: colors.red, fontWeight: '900' },
   expenseCopy: { flex: 1, marginLeft: 12 },
   expenseName: { color: colors.text, fontSize: 14, fontWeight: '900' },
   expenseAmount: { color: colors.text, fontSize: 14, fontWeight: '900' },
   card: { backgroundColor: colors.surface, borderRadius: 20, padding: 17, borderWidth: 1, borderColor: colors.border, gap: 13 },
   formHint: { color: colors.dim, fontSize: 11 },
-  input: { borderRadius: 13, borderWidth: 1, borderColor: colors.border, backgroundColor: '#0A0D13', color: colors.text, paddingHorizontal: 14, paddingVertical: 13, fontSize: 14 },
+  input: { borderRadius: 13, borderWidth: 1, borderColor: colors.border, backgroundColor: '#0B0709', color: colors.text, paddingHorizontal: 14, paddingVertical: 13, fontSize: 14 },
   chips: { gap: 7 },
-  chip: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: '#222838', backgroundColor: '#151923' },
-  chipActive: { backgroundColor: colors.purpleSoft, borderColor: '#54448B' },
-  chipText: { color: '#7D8493', fontSize: 12 },
-  chipTextActive: { color: '#D0C6FF', fontWeight: '900' },
-  primaryButton: { flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: colors.purple, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
+  chip: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: '#3D2026', backgroundColor: '#1A0D10' },
+  chipActive: { backgroundColor: colors.maroonDeep, borderColor: '#742635' },
+  chipText: { color: '#967A80', fontSize: 12 },
+  chipTextActive: { color: '#FFC3CB', fontWeight: '900' },
+  primaryButton: { flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: colors.red, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
   primaryText: { color: colors.white, fontWeight: '900' },
   miniHero: { backgroundColor: colors.surface2, borderRadius: 20, borderWidth: 1, borderColor: colors.border, padding: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   miniTotal: { color: colors.text, fontSize: 31, fontWeight: '900', marginTop: 4 },
-  badge: { width: 62, height: 62, borderRadius: 20, backgroundColor: colors.purpleSoft, borderWidth: 1, borderColor: '#463773', alignItems: 'center', justifyContent: 'center' },
-  badgeNum: { color: colors.purple, fontSize: 18, fontWeight: '900' },
+  badge: { width: 62, height: 62, borderRadius: 20, backgroundColor: colors.redSoft, borderWidth: 1, borderColor: '#67202C', alignItems: 'center', justifyContent: 'center' },
+  badgeNum: { color: colors.red, fontSize: 18, fontWeight: '900' },
   reportRow: { gap: 8 },
-  track: { height: 8, borderRadius: 5, overflow: 'hidden', backgroundColor: '#1A1F2A' },
-  fill: { height: 8, borderRadius: 5, backgroundColor: colors.purple },
-  toggle: { width: 48, height: 28, borderRadius: 16, padding: 3, justifyContent: 'center', backgroundColor: '#252A37' },
-  toggleOn: { backgroundColor: colors.purple },
-  knob: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#F2F3F7' },
+  track: { height: 8, borderRadius: 5, overflow: 'hidden', backgroundColor: '#241318' },
+  fill: { height: 8, borderRadius: 5, backgroundColor: colors.red },
+  toggle: { width: 48, height: 28, borderRadius: 16, padding: 3, justifyContent: 'center', backgroundColor: '#3C2228' },
+  toggleOn: { backgroundColor: colors.red },
+  knob: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#FFF8F6' },
   knobOn: { alignSelf: 'flex-end' },
-  nav: { flexDirection: 'row', paddingTop: 9, paddingBottom: 7, backgroundColor: '#090C12', borderTopWidth: 1, borderTopColor: colors.border },
+  nav: { flexDirection: 'row', paddingTop: 9, paddingBottom: 7, backgroundColor: '#0B0709', borderTopWidth: 1, borderTopColor: colors.border },
   navItem: { flex: 1, alignItems: 'center', gap: 3 },
-  navLabel: { fontSize: 10, fontWeight: '900', color: '#61687A' },
-  active: { color: colors.purple },
+  navLabel: { fontSize: 10, fontWeight: '900', color: '#7E686C' },
+  active: { color: colors.red },
   modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(2,3,7,0.82)', justifyContent: 'flex-end' },
   modalKeyboard: { width: '100%' },
-  modal: { backgroundColor: '#0C1017', padding: 22, borderTopLeftRadius: 27, borderTopRightRadius: 27, borderWidth: 1, borderColor: colors.border, gap: 13 },
-  modalHandle: { width: 42, height: 4, borderRadius: 2, backgroundColor: '#3A4050', alignSelf: 'center', marginBottom: 2 },
+  modal: { backgroundColor: '#16090C', padding: 22, borderTopLeftRadius: 27, borderTopRightRadius: 27, borderWidth: 1, borderColor: colors.border, gap: 13 },
+  modalHandle: { width: 42, height: 4, borderRadius: 2, backgroundColor: '#62333B', alignSelf: 'center', marginBottom: 2 },
   quickInput: { minHeight: 125, textAlignVertical: 'top' },
   modalActions: { flexDirection: 'row', gap: 10 },
   secondaryButton: { flex: 1, minHeight: 48, borderRadius: 13, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface2, alignItems: 'center', justifyContent: 'center' },
-  secondaryText: { color: '#BEB0FF', fontWeight: '900' },
+  secondaryText: { color: '#FFB7C0', fontWeight: '900' },
 })
