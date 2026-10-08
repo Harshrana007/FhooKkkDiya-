@@ -60,6 +60,7 @@ const LEGACY_EXPENSES_KEY = '@spendly/expenses'
 const LEGACY_REMINDERS_KEY = '@spendly/reminders'
 const LEGACY_WELCOME_KEY = '@spendly/welcome-seen'
 
+const MAX_EXPENSE = 20000
 const categories = ['Food', 'Chai', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Travel', 'Family', 'Other']
 
 // The comedy engine intentionally uses original lines inspired by familiar Indian-comedy
@@ -333,8 +334,13 @@ const getPunchline = (gaaliMode: boolean, index: number, total: number, count: n
 }
 
 const currency = (amount: number) => `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
-const dateKey = (date: Date) => date.toISOString().slice(0, 10)
-const monthKey = (date: Date) => date.toISOString().slice(0, 7)
+const dateKey = (date: Date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return year + '-' + month + '-' + day
+}
+const monthKey = (date: Date) => dateKey(date).slice(0, 7)
 const readableDate = (date: Date) => date.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' })
 
 export default function App() {
@@ -355,6 +361,8 @@ export default function App() {
   const [welcomeVisible, setWelcomeVisible] = useState(false)
   const [salary, setSalary] = useState(0)
   const [salaryDraft, setSalaryDraft] = useState('')
+  const [deleteCandidate, setDeleteCandidate] = useState<Expense | null>(null)
+  const [toast, setToast] = useState('')
 
   const screenOpacity = useRef(new Animated.Value(1)).current
   const screenY = useRef(new Animated.Value(0)).current
@@ -367,6 +375,8 @@ export default function App() {
   const orbOpacity = useRef(new Animated.Value(0.35)).current
   const buttonScale = useRef(new Animated.Value(1)).current
   const avatarScale = useRef(new Animated.Value(1)).current
+  const toastY = useRef(new Animated.Value(12)).current
+  const toastOpacity = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
     let mounted = true
@@ -951,7 +961,7 @@ const styles = StyleSheet.create({
   orb: { position: 'absolute', width: 340, height: 340, borderRadius: 170, backgroundColor: colors.purple, opacity: 0.12, right: -130, top: -110 },
   orb2: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: colors.mint, opacity: 0.07, left: -140, bottom: -100 },
   welcomeKeyboard: { flex: 1, width: '100%' },
-  welcomeScrollContent: { flexGrow: 1, justifyContent: 'center', paddingVertical: 12 }
+  welcomeScrollContent: { flexGrow: 1, justifyContent: 'center', paddingVertical: 12 },
   welcomeContent: { width: '100%' },
   avatarLargeWrap: { width: 112, height: 112, borderRadius: 56, overflow: 'hidden', borderWidth: 2, borderColor: '#44376C', backgroundColor: '#151925', marginBottom: 18 },
   quoteCard: { marginTop: 16, padding: 15, borderRadius: 17, backgroundColor: '#0E1118', borderWidth: 1, borderColor: '#2A3040' },
