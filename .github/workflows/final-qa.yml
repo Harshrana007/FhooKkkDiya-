@@ -19,6 +19,15 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Expo config validation
+        run: npx expo@51 config --type public > /dev/null
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Web bundle smoke test
+        run: npx expo@51 export --platform web --output-dir .expo-web-smoke
+
       - name: Parse TypeScript source
         run: npx prettier@3 App.tsx --parser typescript > /dev/null
 
