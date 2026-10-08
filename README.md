@@ -160,7 +160,9 @@ GitHub Actions runs:
 2. Prettier source/config check
 3. JSON validation
 4. explicit dependency compatibility audit
-5. product-level static assertions
+5. TypeScript strict check
+6. Expo web bundle smoke test
+7. product-level static assertions
 
 The QA assertions cover:
 - stale dependency/config cleanup
@@ -172,6 +174,8 @@ The QA assertions cover:
 - onboarding scrolling
 - theme configuration
 - version alignment
+- strict TypeScript compilation
+- Expo web bundle export
 
 ## Dependency policy
 

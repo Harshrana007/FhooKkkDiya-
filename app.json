@@ -23,7 +23,7 @@
       "backgroundColor": "#080506"
     },
     "web": {
-      "favicon": "./public/icon.svg",
+      "favicon": "./dist/apple-icon.png",
       "name": "FhooKkkDiya",
       "shortName": "FhooKkkDiya",
       "themeColor": "#080506"

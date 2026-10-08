@@ -5,11 +5,12 @@ const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const expo = JSON.parse(fs.readFileSync('app.json', 'utf8'))
 
 const styleStart = app.indexOf('const styles = StyleSheet.create({')
-const styleRefs = [...new Set([...app.matchAll(/styles\\.([A-Za-z0-9_]+)/g)].map(match => match[1]))]
+const styleRefs = [...new Set([...app.matchAll(/styles\.([A-Za-z0-9_]+)/g)].map(match => match[1]))]
 const styleKeys = styleStart >= 0
-  ? [...new Set([...app.slice(styleStart).matchAll(/^\\s{2}([A-Za-z0-9_]+):/gm)].map(match => match[1]))]
+  ? [...new Set([...app.slice(styleStart).matchAll(/^\s{2}([A-Za-z0-9_]+):/gm)].map(match => match[1]))]
   : []
 const missingStyles = styleRefs.filter(name => !styleKeys.includes(name))
+const duplicateStyleKeys = styleKeys.filter((name, index) => styleKeys.indexOf(name) !== index)
 
 const punchlineStart = app.indexOf('const getPunchline')
 const punchlineEnd = app.indexOf('const currency', punchlineStart)
@@ -44,10 +45,12 @@ const assertions = [
   ['Salary delete/reset flow exists', app.includes('const resetSalary = () =>') && app.includes('Reset salary')],
   ['No misleading reminder toggle remains', !app.includes('Roz ka hisaab') && !app.includes('REMINDERS_KEY')],
   ['Every styles.* reference has a StyleSheet key', missingStyles.length === 0],
+  ['StyleSheet has no duplicate keys', duplicateStyleKeys.length === 0],
   ['No orphaned delete handler remains', !app.includes('deleteExpense(')],
   ['Red-maroon theme is defined', app.includes("red: '#E5384F'") && app.includes("maroon: '#6E1C2A'")],
   ['Package and Expo versions match', pkg.version === expo.expo.version],
   ['Expo primary color matches the new theme', expo.expo.primaryColor === '#E5384F'],
+  ['Web favicon uses the installed launcher PNG', expo.expo.web?.favicon === './dist/apple-icon.png'],
 ]
 
 let failed = 0
