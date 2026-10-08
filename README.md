@@ -4,7 +4,7 @@ A private, local-first Gen-Z expense tracker built with React Native + Expo. It 
 
 > track the money before the money tracks you.
 
-The app combines practical expense logging with Indian meme energy, Hinglish roasting, salary-aware spending context, and an optional unfiltered Gaali Mode.
+The app combines practical expense logging with Indian meme energy, Hinglish roasting, salary-aware spending context, and an optional unfiltered  Mode.
 
 ## Release
 
@@ -29,7 +29,7 @@ This release adds the salary system, context-aware comedy tiers, CID/Instagram-s
 - Salary can be edited later from **Jugaad**.
 - Salary context feeds the comedy engine as well as the spending summary.
 
-### The ₹20,000 comedy ladder
+### The ₹comedy ladder
 The app is tuned around a maximum individual expense of **₹20,000**.
 
 The roast intensity changes with:
@@ -37,13 +37,13 @@ The roast intensity changes with:
 - the largest individual expense today
 - number of expenses today
 - salary percentage used
-- Gaali Mode state
+-  Mode state
 
 Higher tiers move into investigation/CID-style reactions and final-boss jokes rather than repeating the same generic punchline.
 
 ### Comedy modes
 - Original Hinglish sarcasm.
-- Optional MC/BC/English profanity through Gaali Mode.
+- Optional MC/BC/English profanity through Mode.
 - Indian comedy-film archetype humour.
 - CID-style investigation reactions.
 - Instagram/Reels-style meme language.
@@ -88,7 +88,7 @@ Current local keys:
 
 - `@fhookkdiya/expenses`
 - `@fhookkdiya/monthly-salary`
-- `@fhookkdiya/gaali-mode`
+- `@fhookkdiya/-mode`
 - `@fhookkdiya/welcome-seen`
 
 Legacy Spendly keys for expenses and onboarding are still read for migration compatibility.
