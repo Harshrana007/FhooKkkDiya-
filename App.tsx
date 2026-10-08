@@ -6,6 +6,48 @@ import { StatusBar } from 'expo-status-bar'
 
 const GUTZ_AVATAR_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\">\n  <defs>\n    <linearGradient id=\"bg\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"1\"><stop stop-color=\"#191326\"/><stop offset=\"1\" stop-color=\"#090b11\"/></linearGradient>\n  </defs>\n  <rect width=\"128\" height=\"128\" rx=\"32\" fill=\"url(#bg)\"/>\n  <circle cx=\"64\" cy=\"66\" r=\"34\" fill=\"#e9e1ce\"/>\n  <path d=\"M31 54c2-27 14-39 21-42 2 10 6 13 11 5 4 10 10 3 14-9 4 9 10 12 16 1 4 12 12 11 16 3 2 15 1 27-3 40-10-12-21-16-37-16-15 0-28 5-38 18z\" fill=\"#121116\"/>\n  <path d=\"M44 49c3-13 9-19 20-22 12 2 21 8 25 22-7-6-14-9-25-9-9 0-14 3-20 9z\" fill=\"#ffffff\" opacity=\".65\"/>\n  <circle cx=\"53\" cy=\"67\" r=\"5\" fill=\"#17151a\"/>\n  <circle cx=\"76\" cy=\"67\" r=\"5\" fill=\"#17151a\"/>\n  <path d=\"M56 83c5 4 15 4 20 0\" fill=\"none\" stroke=\"#1a171b\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n  <path d=\"M30 78c12 9 21 12 34 13 12 0 23-3 34-12\" fill=\"none\" stroke=\"#0d0d11\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <path d=\"M50 99c7 6 20 6 28 0\" fill=\"none\" stroke=\"#0d0d11\" stroke-width=\"6\" stroke-linecap=\"round\"/>\n</svg>"
 
+const svgWithColor = (xml: string, color: string) => xml.replace(/CURRENT_COLOR/g, color)
+
+const SvgIcon = ({ xml, size = 20, color = '#61687A' }: { xml: string; size?: number; color?: string }) => (
+  <SvgXml xml={svgWithColor(xml, color)} width={size} height={size} />
+)
+
+const ICON_HOME = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="CURRENT_COLOR" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 10.8 12 3l9 7.8"/>
+  <path d="M5.5 9.8V21h13V9.8"/>
+  <path d="M9.5 21v-6h5v6"/>
+</svg>`
+
+const ICON_HISTORY = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="CURRENT_COLOR" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 4.5h12v15H6z"/>
+  <path d="M9 8h6M9 12h6M9 16h4"/>
+</svg>`
+
+const ICON_REPORTS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="CURRENT_COLOR" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M5 19V9M12 19V5M19 19v-7"/>
+  <path d="M3.5 19.5h17"/>
+</svg>`
+
+const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="CURRENT_COLOR" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="3.2"/>
+  <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.07.07-1.95 1.95-.07-.07A1.7 1.7 0 0 0 15.92 18a1.7 1.7 0 0 0-1 1.55v.1h-2.76v-.1A1.7 1.7 0 0 0 11.08 18a1.7 1.7 0 0 0-1.87.34l-.07.07-1.95-1.95.07-.07A1.7 1.7 0 0 0 7.6 15a1.7 1.7 0 0 0-1.55-1H5.9v-2.76H6A1.7 1.7 0 0 0 7.6 10a1.7 1.7 0 0 0-.34-1.87l-.07-.07 1.95-1.95.07.07A1.7 1.7 0 0 0 11.08 6a1.7 1.7 0 0 0 1-1.55v-.1h2.76v.1A1.7 1.7 0 0 0 15.92 6a1.7 1.7 0 0 0 1.87-.34l.07-.07 1.95 1.95-.07.07A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.55 1h.1v2.76h-.1a1.7 1.7 0 0 0-1.55 1.24Z"/>
+</svg>`
+
+const ICON_MONEY = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="CURRENT_COLOR" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="6" width="18" height="12" rx="2.2"/>
+  <circle cx="12" cy="12" r="2.8"/>
+  <path d="M7 9.2h.01M17 14.8h.01"/>
+</svg>`
+
+const ICON_ARROW = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="CURRENT_COLOR" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M5 12h13"/>
+  <path d="m13 6 6 6-6 6"/>
+</svg>`
+
+const ICON_ADD = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="CURRENT_COLOR" stroke-width="2.1" stroke-linecap="round">
+  <path d="M12 5v14M5 12h14"/>
+</svg>`
+
 type Tab = 'today' | 'history' | 'reports' | 'settings'
 type Expense = { id: number; amount: number; description: string; category: string; date: string }
 
@@ -245,7 +287,7 @@ export default function App() {
       <SafeAreaView style={styles.safe}>
         <StatusBar style="light" />
         <View style={styles.boot}>
-          <View style={styles.logoMark}><Text style={styles.logoText}>₹</Text></View>
+          <View style={styles.logoMark}><SvgIcon xml={ICON_MONEY} size={30} color={colors.white} /></View>
           <Text style={styles.bootTitle}>FhooKkkDiya</Text>
           <Text style={styles.bootCopy}>Paisa ka post-mortem set ho raha hai...</Text>
         </View>
@@ -293,7 +335,7 @@ export default function App() {
                 onPress={enterApp}
               >
                 <Text style={styles.enterText}>Chalo paisa ginte hain</Text>
-                <Text style={styles.enterArrow}>→</Text>
+                <SvgIcon xml={ICON_ARROW} size={21} color={colors.white} />
               </TouchableOpacity>
             </Animated.View>
 
@@ -356,7 +398,7 @@ export default function App() {
                 ) : (
                   todayExpenses.map(expense => (
                     <TouchableOpacity key={expense.id} activeOpacity={0.86} onLongPress={() => deleteExpense(expense.id)} style={styles.expenseRow}>
-                      <View style={styles.expenseIcon}><Text style={styles.expenseIconText}>₹</Text></View>
+                      <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.mint} /></View>
                       <View style={styles.expenseCopy}>
                         <Text style={styles.expenseName}>{expense.description}</Text>
                         <Text style={styles.muted}>{expense.category} • long press = delete</Text>
@@ -379,7 +421,7 @@ export default function App() {
                     ))}
                   </ScrollView>
                   <TouchableOpacity onPress={addExpense} style={styles.primaryButton}>
-                    <Text style={styles.primaryText}>Kharcha chipka</Text><Text style={styles.primaryArrow}>↗</Text>
+                    <Text style={styles.primaryText}>Kharcha chipka</Text><SvgIcon xml={ICON_ARROW} size={18} color={colors.white} />
                   </TouchableOpacity>
                 </View>
               </>
@@ -481,7 +523,7 @@ export default function App() {
               <TextInput autoFocus multiline value={quickText} onChangeText={setQuickText} placeholder={'Chai 120\nMetro 80'} placeholderTextColor={colors.dim} style={[styles.input, styles.quickInput]} />
               <View style={styles.modalActions}>
                 <TouchableOpacity onPress={() => setQuickEntry(false)} style={styles.secondaryButton}><Text style={styles.secondaryText}>Rehne de</Text></TouchableOpacity>
-                <TouchableOpacity onPress={addQuickExpenses} style={styles.primaryButton}><Text style={styles.primaryText}>Add all</Text><Text style={styles.primaryArrow}>↗</Text></TouchableOpacity>
+                <TouchableOpacity onPress={addQuickExpenses} style={styles.primaryButton}><Text style={styles.primaryText}>Add all</Text><SvgIcon xml={ICON_ADD} size={18} color={colors.white} /></TouchableOpacity>
               </View>
             </View>
           </View>
