@@ -11,7 +11,7 @@
     "primaryColor": "#9B7CFF",
     "extra": {
       "eas": {
-        "projectId": "ed04d1df-f447-4ef0-8180-f80bbc4004ac"
+        "projectId": "940fa81f-d41d-4501-ae2f-8703d7044443"
       }
     },
     "android": {
@@ -28,6 +28,8 @@
       "shortName": "FhooKkkDiya",
       "themeColor": "#07080B"
     },
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": [
+      "**/*"
+    ]
   }
 }
