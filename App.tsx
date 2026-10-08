@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Alert, Animated, Easing, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 import { StatusBar } from 'expo-status-bar'
 
@@ -412,7 +412,12 @@ export default function App() {
           <View style={styles.liveDot} />
         </View>
 
-        <Animated.View style={[styles.screen, { opacity: screenOpacity, transform: [{ translateY: screenY }, { translateX: screenX }] }]}>
+        <KeyboardAvoidingView
+          style={styles.keyboardArea}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={0}
+        >
+          <Animated.View style={[styles.screen, { opacity: screenOpacity, transform: [{ translateY: screenY }, { translateX: screenX }] }]}>
           <ScrollView
             ref={scrollRef}
             style={styles.scroll}
@@ -565,7 +570,8 @@ export default function App() {
               </>
             )}
           </ScrollView>
-        </Animated.View>
+          </Animated.View>
+        </KeyboardAvoidingView>
 
         <View style={styles.nav}>
           {([
@@ -587,6 +593,11 @@ export default function App() {
 
         {quickEntry && (
           <View style={styles.modalBackdrop}>
+            <KeyboardAvoidingView
+              style={styles.modalKeyboard}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              keyboardVerticalOffset={0}
+            >
             <View style={styles.modal}>
               <View style={styles.modalHandle} />
               <Text style={styles.title}>Jaldi se daal</Text>
@@ -597,6 +608,7 @@ export default function App() {
                 <TouchableOpacity onPress={addQuickExpenses} style={styles.primaryButton}><Text style={styles.primaryText}>Add all</Text><SvgIcon xml={ICON_ADD} size={18} color={colors.white} /></TouchableOpacity>
               </View>
             </View>
+            </KeyboardAvoidingView>
           </View>
         )}
       </View>
@@ -704,6 +716,7 @@ const styles = StyleSheet.create({
   navLabel: { fontSize: 10, fontWeight: '900', color: '#61687A' },
   active: { color: colors.purple },
   modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(2,3,7,0.82)', justifyContent: 'flex-end' },
+  modalKeyboard: { width: '100%' },
   modal: { backgroundColor: '#0C1017', padding: 22, borderTopLeftRadius: 27, borderTopRightRadius: 27, borderWidth: 1, borderColor: colors.border, gap: 13 },
   modalHandle: { width: 42, height: 4, borderRadius: 2, backgroundColor: '#3A4050', alignSelf: 'center', marginBottom: 2 },
   quickInput: { minHeight: 125, textAlignVertical: 'top' },
