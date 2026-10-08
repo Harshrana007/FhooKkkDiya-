@@ -55,6 +55,7 @@ const EXPENSES_KEY = '@fhookkdiya/expenses'
 const REMINDERS_KEY = '@fhookkdiya/reminders'
 const GAALI_MODE_KEY = '@fhookkdiya/gaali-mode'
 const WELCOME_KEY = '@fhookkdiya/welcome-seen'
+const SALARY_KEY = '@fhookkdiya/monthly-salary'
 const LEGACY_EXPENSES_KEY = '@spendly/expenses'
 const LEGACY_REMINDERS_KEY = '@spendly/reminders'
 const LEGACY_WELCOME_KEY = '@spendly/welcome-seen'
@@ -140,8 +141,23 @@ const deadpanPunchlines = [
   'Everything is under control. There is no control.',
 ]
 
-const getPunchline = (gaaliMode: boolean, index: number, total: number, count: number) => {
+const getPunchline = (gaaliMode: boolean, index: number, total: number, count: number, monthTotal = 0, salary = 0) => {
+  const salaryPercent = salary > 0 ? Math.round((monthTotal / salary) * 100) : 0
   const dynamic = [
+    ...(salary >= 1 && salaryPercent >= 100 ? [
+      `Salary ka ${salaryPercent}% touch ho gaya. Month abhi baaki hai, boss.`,
+      'Monthly salary ne resignation letter draft kar diya hai.',
+    ] : []),
+    ...(salary >= 1 && salaryPercent >= 80 && salaryPercent < 100 ? [
+      `Salary ka ${salaryPercent}% already committed. Thoda sa brake bhi use kar lo.`,
+      'Month-end ne door se haath hila diya hai.',
+    ] : []),
+    ...(salary >= 1 && salaryPercent >= 60 && salaryPercent < 80 ? [
+      `Salary ka ${salaryPercent}% gaya. Abhi comeback possible hai.`,
+    ] : []),
+    ...(salary >= 1 && salaryPercent > 0 && salaryPercent < 30 ? [
+      `Salary ka sirf ${salaryPercent}% spent. Wallet abhi khush hai.`,
+    ] : []),
     ...(total >= 10000 ? [
       '₹' + total.toLocaleString('en-IN') + ' already? Bhai ye expense tracker hai, IPL auction nahi.',
       '₹' + total.toLocaleString('en-IN') + ' ka nuksaan dekh ke accountant ne chai mangwa li.',
@@ -171,6 +187,7 @@ const getPunchline = (gaaliMode: boolean, index: number, total: number, count: n
 
 const currency = (amount: number) => `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
 const dateKey = (date: Date) => date.toISOString().slice(0, 10)
+const monthKey = (date: Date) => date.toISOString().slice(0, 7)
 const readableDate = (date: Date) => date.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' })
 
 export default function App() {
@@ -189,6 +206,8 @@ export default function App() {
   const [gaaliMode, setGaaliMode] = useState(true)
   const [storageReady, setStorageReady] = useState(false)
   const [welcomeVisible, setWelcomeVisible] = useState(false)
+  const [salary, setSalary] = useState(0)
+  const [salaryDraft, setSalaryDraft] = useState('')
 
   const screenOpacity = useRef(new Animated.Value(1)).current
   const screenY = useRef(new Animated.Value(0)).current
@@ -206,11 +225,12 @@ export default function App() {
     let mounted = true
     ;(async () => {
       try {
-        const [savedExpensesNew, savedRemindersNew, gaaliModeSaved, welcomeSeenNew, savedExpensesLegacy, savedRemindersLegacy, welcomeSeenLegacy] = await Promise.all([
+        const [savedExpensesNew, savedRemindersNew, gaaliModeSaved, welcomeSeenNew, savedSalary, savedExpensesLegacy, savedRemindersLegacy, welcomeSeenLegacy] = await Promise.all([
           AsyncStorage.getItem(EXPENSES_KEY),
           AsyncStorage.getItem(REMINDERS_KEY),
           AsyncStorage.getItem(GAALI_MODE_KEY),
           AsyncStorage.getItem(WELCOME_KEY),
+          AsyncStorage.getItem(SALARY_KEY),
           AsyncStorage.getItem(LEGACY_EXPENSES_KEY),
           AsyncStorage.getItem(LEGACY_REMINDERS_KEY),
           AsyncStorage.getItem(LEGACY_WELCOME_KEY),
@@ -233,6 +253,13 @@ export default function App() {
           if (savedRemindersNew === null) AsyncStorage.setItem(REMINDERS_KEY, savedReminders).catch(() => {})
         }
         if (gaaliModeSaved !== null) setGaaliMode(gaaliModeSaved === 'true')
+        if (savedSalary !== null) {
+          const parsedSalary = Number(savedSalary)
+          if (Number.isFinite(parsedSalary) && parsedSalary > 0) {
+            setSalary(parsedSalary)
+            setSalaryDraft(String(parsedSalary))
+          }
+        }
         setWelcomeVisible(welcomeSeen !== 'true')
         if (!welcomeSeenNew && welcomeSeenLegacy === 'true') AsyncStorage.setItem(WELCOME_KEY, 'true').catch(() => {})
       } catch {
@@ -260,6 +287,13 @@ export default function App() {
       Alert.alert('Storage error', 'Your reminder setting could not be saved locally.')
     })
   }, [reminders, storageReady])
+
+  useEffect(() => {
+    if (!storageReady) return
+    AsyncStorage.setItem(SALARY_KEY, String(salary)).catch(() => {
+      Alert.alert('Storage error', 'Your salary setting could not be saved locally.')
+    })
+  }, [salary, storageReady])
 
   useEffect(() => {
     if (!storageReady) return
@@ -326,6 +360,8 @@ export default function App() {
     Animated.spring(value, { toValue: target, friction: 8, tension: 120, useNativeDriver: true }).start()
 
   const enterApp = () => {
+    const trimmedSalary = salaryDraft.trim()
+    if (trimmedSalary) saveSalary(trimmedSalary)
     Animated.parallel([
       Animated.timing(welcomeOpacity, { toValue: 0, duration: 240, useNativeDriver: true }),
       Animated.timing(welcomeY, { toValue: -16, duration: 240, useNativeDriver: true }),
@@ -345,6 +381,11 @@ export default function App() {
   const todayExpenses = expenses.filter(e => e.date === todayKey)
   const total = todayExpenses.reduce((sum, e) => sum + e.amount, 0)
   const allTotal = expenses.reduce((sum, e) => sum + e.amount, 0)
+  const thisMonth = monthKey(today)
+  const monthExpenses = expenses.filter(e => e.date?.slice(0, 7) === thisMonth)
+  const monthTotal = monthExpenses.reduce((sum, e) => sum + e.amount, 0)
+  const salaryRemaining = salary - monthTotal
+  const salaryPercent = salary > 0 ? Math.round((monthTotal / salary) * 100) : 0
 
   const categoryTotals = useMemo(
     () => categories.map(name => ({
@@ -353,6 +394,17 @@ export default function App() {
     })).filter(item => item.amount > 0).sort((a, b) => b.amount - a.amount),
     [expenses],
   )
+
+  const saveSalary = (raw: string) => {
+    const value = Number(raw)
+    if (!Number.isFinite(value) || value <= 0) {
+      Alert.alert('Salary check', 'Enter a monthly salary greater than ₹0.')
+      return false
+    }
+    setSalary(value)
+    setSalaryDraft(String(value))
+    return true
+  }
 
   const addExpense = () => {
     const numericAmount = Number(amount)
@@ -412,6 +464,7 @@ export default function App() {
         <View style={styles.welcomeScreen}>
           <Animated.View pointerEvents="none" style={[styles.orb, { opacity: orbOpacity, transform: [{ scale: orbScale }] }]} />
           <Animated.View pointerEvents="none" style={[styles.orb2, { opacity: Animated.multiply(orbOpacity, 0.7), transform: [{ scale: orbScale }] }]} />
+          <KeyboardAvoidingView style={styles.welcomeKeyboard} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <Animated.View style={[styles.welcomeContent, { opacity: welcomeOpacity, transform: [{ translateY: welcomeY }] }]}>
             <TouchableOpacity onPress={triggerAvatar} activeOpacity={0.9}>
               <Animated.View style={[styles.avatarLargeWrap, { transform: [{ scale: avatarScale }] }]}>
@@ -426,8 +479,24 @@ export default function App() {
               Welcome! Pehle hi bata do, khud ki marzi se aaye ho ya bank balance dekh ke rona aa raha tha?
             </Text>
             <View style={styles.quoteCard}>
-              <Text style={styles.quoteKicker}>AAGEY KA SAMPLE</Text>
-              <Text style={styles.quoteText}>“BC, paisa toh tha hi nahi... phir yeh expense kaise aa gaya?”</Text>
+              <Text style={styles.quoteKicker}>PEHLA SETUP</Text>
+              <Text style={styles.quoteText}>Is month salary kitni aayi? Bata de. Phir app batayega ki paisa kitna bacha aur kitna cinematic ho gaya.</Text>
+              <TextInput
+                value={salaryDraft}
+                onChangeText={setSalaryDraft}
+                keyboardType="decimal-pad"
+                placeholder="Monthly salary e.g. 50000"
+                placeholderTextColor={colors.dim}
+                style={styles.salarySetupInput}
+              />
+              <View style={styles.presetRow}>
+                {[15000, 25000, 50000, 75000].map(value => (
+                  <TouchableOpacity key={value} onPress={() => setSalaryDraft(String(value))} style={styles.presetChip}>
+                    <Text style={styles.presetChipText}>{currency(value)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Text style={styles.salaryOptional}>Optional. Baad mein Jugaad mein bhi set kar sakte ho.</Text>
             </View>
 
             <View style={styles.pills}>
@@ -449,8 +518,9 @@ export default function App() {
               </TouchableOpacity>
             </Animated.View>
 
-            <Text style={styles.welcomeFoot}>Data local storage mein. App band karo, drama band nahi hoga.</Text>
+            <Text style={styles.welcomeFoot}>Data local storage mein. Salary aur expenses sirf isi device par rehte hain.</Text>
           </Animated.View>
+          </KeyboardAvoidingView>
         </View>
       </SafeAreaView>
     )
@@ -500,13 +570,34 @@ export default function App() {
                   </TouchableOpacity>
                 </View>
 
+                <View style={styles.salaryCard}>
+                  <View style={styles.rowBetween}>
+                    <View style={styles.flex}>
+                      <Text style={styles.label}>IS MONTH KI SALARY</Text>
+                      <Text style={styles.salaryBig}>{salary > 0 ? currency(salary) : 'Set karo'}</Text>
+                    </View>
+                    <View style={styles.salaryBadge}>
+                      <Text style={styles.salaryBadgeNum}>{salary > 0 ? `${salaryPercent}%` : '—'}</Text>
+                      <Text style={styles.salaryBadgeLabel}>USED</Text>
+                    </View>
+                  </View>
+                  <View style={styles.salaryStats}>
+                    <View style={styles.salaryStat}><Text style={styles.salaryStatLabel}>SPENT</Text><Text style={styles.salaryStatValue}>{currency(monthTotal)}</Text></View>
+                    <View style={styles.salaryStat}><Text style={styles.salaryStatLabel}>{salaryRemaining >= 0 ? 'LEFT' : 'OVER'}</Text><Text style={[styles.salaryStatValue, salaryRemaining < 0 && styles.salaryDanger]}>{currency(Math.abs(salaryRemaining))}</Text></View>
+                  </View>
+                  <View style={styles.salaryTrack}><View style={[styles.salaryFill, { width: `${Math.min(100, Math.max(0, salaryPercent))}%` }]} /></View>
+                  <Text style={styles.salaryHint}>
+                    {salary <= 0 ? 'Salary set karo. Phir FhooKkkDiya month ka reality check dega.' : salaryPercent >= 100 ? 'Salary se zyada kharch ho gaya. Calendar ko blame kar sakte ho, calculator ko nahi.' : salaryPercent >= 80 ? 'Month-end ko ab thoda space chahiye.' : salaryPercent >= 50 ? 'Halfway gone. Brake abhi bhi kaam karta hai.' : 'Wallet abhi comparatively theek chal raha hai.'}
+                  </Text>
+                </View>
+
                 <View style={styles.hero}>
                   <View style={styles.heroGlow} />
                   <Text style={styles.label}>AAJ KITNA UDAA?</Text>
                   <Text style={styles.total}>{currency(total)}</Text>
                   <Text style={styles.heroSub}>{todayExpenses.length ? `${todayExpenses.length} kharcha${todayExpenses.length === 1 ? '' : 'y'} recorded` : 'Aaj abhi tak paisa zinda hai. Mashallah.'}</Text>
                   <View style={styles.divider} />
-                  <Text style={styles.heroHint}>{getPunchline(gaaliMode, todayExpenses.length + expenses.length, total, todayExpenses.length)}</Text>
+                  <Text style={styles.heroHint}>{getPunchline(gaaliMode, todayExpenses.length + expenses.length, total, todayExpenses.length, monthTotal, salary)}</Text>
                 </View>
 
                 <View style={styles.rowBetween}>
@@ -603,6 +694,14 @@ export default function App() {
                 <Text style={styles.kicker}>JUGAAD ZONE</Text>
                 <Text style={styles.title}>Jugaad</Text>
                 <View style={styles.card}>
+                  <Text style={styles.sectionTitle}>Salary ka Jugaad</Text>
+                  <Text style={styles.formHint}>Monthly salary set karo. Spending is month ke total se compare hoga.</Text>
+                  <View style={styles.salaryEditRow}>
+                    <TextInput value={salaryDraft} onChangeText={setSalaryDraft} keyboardType="decimal-pad" placeholder="Monthly salary" placeholderTextColor={colors.dim} style={styles.input} />
+                    <TouchableOpacity onPress={() => saveSalary(salaryDraft)} style={styles.salarySaveButton}><Text style={styles.primaryText}>Save</Text></TouchableOpacity>
+                  </View>
+                  <Text style={styles.muted}>{salary > 0 ? `Current: ${currency(salary)} • ${currency(monthTotal)} spent this month` : 'Not set yet.'}</Text>
+                  <View style={styles.divider} />
                   <View style={styles.rowBetween}>
                     <View style={styles.flex}>
                       <Text style={styles.expenseName}>Roz ka hisaab</Text>
@@ -701,11 +800,17 @@ const styles = StyleSheet.create({
   welcomeScreen: { flex: 1, justifyContent: 'center', padding: 25, overflow: 'hidden', backgroundColor: colors.bg },
   orb: { position: 'absolute', width: 340, height: 340, borderRadius: 170, backgroundColor: colors.purple, opacity: 0.12, right: -130, top: -110 },
   orb2: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: colors.mint, opacity: 0.07, left: -140, bottom: -100 },
+  welcomeKeyboard: { width: '100%' },
   welcomeContent: { width: '100%' },
   avatarLargeWrap: { width: 112, height: 112, borderRadius: 56, overflow: 'hidden', borderWidth: 2, borderColor: '#44376C', backgroundColor: '#151925', marginBottom: 18 },
   quoteCard: { marginTop: 16, padding: 15, borderRadius: 17, backgroundColor: '#0E1118', borderWidth: 1, borderColor: '#2A3040' },
   quoteKicker: { color: colors.mint, fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginBottom: 7 },
   quoteText: { color: '#D6D1E8', fontSize: 13.5, lineHeight: 20, fontWeight: '800' },
+  salarySetupInput: { marginTop: 12, borderRadius: 13, borderWidth: 1, borderColor: colors.border, backgroundColor: '#0A0D13', color: colors.text, paddingHorizontal: 13, paddingVertical: 12, fontSize: 14, fontWeight: '800' },
+  presetRow: { flexDirection: 'row', gap: 7, marginTop: 9, flexWrap: 'wrap' },
+  presetChip: { paddingHorizontal: 9, paddingVertical: 7, borderRadius: 10, backgroundColor: '#151923', borderWidth: 1, borderColor: colors.border },
+  presetChipText: { color: '#B9B0DC', fontSize: 10, fontWeight: '900' },
+  salaryOptional: { color: colors.dim, fontSize: 10, marginTop: 9 },
 
   avatarSmallWrap: { width: 46, height: 46, borderRadius: 23, overflow: 'hidden', borderWidth: 1, borderColor: '#3A315B' },
 
@@ -731,6 +836,21 @@ const styles = StyleSheet.create({
 
   quickButton: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   quickText: { color: '#C1B2FF', fontSize: 12, fontWeight: '900' },
+  salaryCard: { backgroundColor: '#0C1115', borderRadius: 22, padding: 17, borderWidth: 1, borderColor: '#20352F', gap: 13 },
+  salaryBig: { color: colors.text, fontSize: 27, fontWeight: '900', marginTop: 4 },
+  salaryBadge: { width: 58, height: 58, borderRadius: 18, backgroundColor: '#15271F', borderWidth: 1, borderColor: '#2B5D4C', alignItems: 'center', justifyContent: 'center' },
+  salaryBadgeNum: { color: colors.mint, fontSize: 15, fontWeight: '900' },
+  salaryBadgeLabel: { color: '#6C8E80', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
+  salaryStats: { flexDirection: 'row', gap: 9 },
+  salaryStat: { flex: 1, padding: 11, borderRadius: 14, backgroundColor: '#0A0F0D', borderWidth: 1, borderColor: '#1A2B25' },
+  salaryStatLabel: { color: '#6F877D', fontSize: 8, fontWeight: '900', letterSpacing: 1.2 },
+  salaryStatValue: { color: '#E5F7F0', fontSize: 15, fontWeight: '900', marginTop: 4 },
+  salaryDanger: { color: '#FF8A8A' },
+  salaryTrack: { height: 7, borderRadius: 5, overflow: 'hidden', backgroundColor: '#18201D' },
+  salaryFill: { height: 7, borderRadius: 5, backgroundColor: colors.mint },
+  salaryHint: { color: '#7D9189', fontSize: 10.5, lineHeight: 16 },
+  salaryEditRow: { flexDirection: 'row', gap: 9, alignItems: 'center' },
+  salarySaveButton: { minHeight: 48, paddingHorizontal: 17, borderRadius: 13, backgroundColor: colors.purple, alignItems: 'center', justifyContent: 'center' },
   hero: { position: 'relative', overflow: 'hidden', backgroundColor: colors.surface2, borderRadius: 25, padding: 22, borderWidth: 1, borderColor: '#282F40' },
   heroGlow: { position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: colors.purple, opacity: 0.1, right: -70, top: -80 },
   label: { color: '#848B9B', fontSize: 9, fontWeight: '900', letterSpacing: 1.6 },
