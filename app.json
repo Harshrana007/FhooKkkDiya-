@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "owner": "gutzx007s",
-    "icon": "./dist/apple-icon.png",
+    "icon": "./assets/app-icon.png",
     "backgroundColor": "#080506",
     "primaryColor": "#E5384F",
     "extra": {
