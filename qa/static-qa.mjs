@@ -50,6 +50,7 @@ const assertions = [
   ['Red-maroon theme is defined', app.includes("red: '#E5384F'") && app.includes("maroon: '#6E1C2A'")],
   ['Package and Expo versions match', pkg.version === expo.expo.version],
   ['Expo primary color matches the new theme', expo.expo.primaryColor === '#E5384F'],
+  ['Web favicon uses the installed launcher PNG', expo.expo.web?.favicon === './dist/apple-icon.png'],
 ]
 
 let failed = 0
