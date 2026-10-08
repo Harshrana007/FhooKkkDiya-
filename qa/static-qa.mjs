@@ -11,6 +11,13 @@ const styleKeys = styleStart >= 0
   : []
 const missingStyles = styleRefs.filter(name => !styleKeys.includes(name))
 
+const punchlineStart = app.indexOf('const getPunchline')
+const punchlineEnd = app.indexOf('const currency', punchlineStart)
+const punchlineBody = punchlineStart >= 0 && punchlineEnd > punchlineStart
+  ? app.slice(punchlineStart, punchlineEnd)
+  : ''
+
+
 const assertions = [
   ['App.tsx has no stale Reanimated config', !app.includes('react-native-reanimated/plugin')],
   ['App.tsx has no stale Expo Router import', !app.includes('expo-router')],
@@ -28,6 +35,12 @@ const assertions = [
   ['Delete confirmation exists', app.includes('Evidence delete karein?')],
   ['Toast feedback exists', app.includes('const showToast') && app.includes('styles.toast')],
   ['Onboarding is scroll-safe', app.includes('styles.welcomeScrollContent')],
+  ['Onboarding crash fix: punchline helper has no component-local date calculation', !punchlineBody.includes('today.getFullYear') && !punchlineBody.includes('today.getMonth') && !punchlineBody.includes('today.getDate')],
+  ['Onboarding crash fix: punchline helper has no component-local salaryRemaining reference', !punchlineBody.includes('salaryRemaining')],
+  ['Expense update flow exists', app.includes('const updateExpense = () =>') && app.includes('onPress={() => startEditExpense(expense)}')],
+  ['Expense edit modal exists', app.includes('Expense edit karo') && app.includes('Save changes')],
+  ['Salary update flow exists', app.includes('const saveSalary = (raw: string)')],
+  ['Salary delete/reset flow exists', app.includes('const resetSalary = () =>') && app.includes('Reset salary')],
   ['No misleading reminder toggle remains', !app.includes('Roz ka hisaab') && !app.includes('REMINDERS_KEY')],
   ['Every styles.* reference has a StyleSheet key', missingStyles.length === 0],
   ['No orphaned delete handler remains', !app.includes('deleteExpense(')],
