@@ -23,7 +23,7 @@ jobs:
         run: npx expo config --type public > /dev/null
 
       - name: Expo web bundle smoke test
-        run: npx expo export --platform web --non-interactive > /dev/null
+        run: npx expo export --platform web > /dev/null
 
       - name: Parse TypeScript source
         run: npx prettier@3 App.tsx --parser typescript > /dev/null
