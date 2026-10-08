@@ -191,6 +191,9 @@ const deadpanPunchlines = [
 
 const getPunchline = (gaaliMode: boolean, index: number, total: number, count: number, monthTotal = 0, salary = 0, peakExpense = 0) => {
   const salaryPercent = salary > 0 ? Math.round((monthTotal / salary) * 100) : 0
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+  const remainingDays = Math.max(1, monthEnd.getDate() - today.getDate() + 1)
+  const safeDaily = salary > 0 ? Math.max(0, salaryRemaining / remainingDays) : 0
   const dynamic = [
     ...(peakExpense >= 20000 ? [
       '₹20,000. Bhai, hosh mein aao. Ye final boss hai.',
@@ -617,7 +620,11 @@ export default function App() {
       return match ? { description: match[1].trim(), amount: Number(match[2]) } : null
     })
     if (!parsed.length || parsed.some(item => !item?.description || !item.amount)) {
-      Alert.alert('Could not read entries', 'Use a format like Lunch 250, one expense per line.')
+      Alert.alert('Format samajh nahi aaya', 'Use: Lunch 250, one expense per line.')
+      return
+    }
+    if (parsed.some(item => item && item.amount > MAX_EXPENSE)) {
+      Alert.alert('Bhai ₹20k max hai 😭', 'Ek quick-entry expense bhi ₹20,000 se upar nahi ho sakta.')
       return
     }
     setExpenses(current => [
@@ -626,6 +633,7 @@ export default function App() {
     ])
     setQuickText('')
     setQuickEntry(false)
+    showToast('✅ ' + parsed.length + ' expense' + (parsed.length === 1 ? '' : 's') + ' saved. Chaos logged.')
   }
 
   if (!storageReady) {
@@ -775,6 +783,15 @@ export default function App() {
                   <Text style={styles.salaryHint}>
                     {salary <= 0 ? 'Salary set karo. Phir FhooKkkDiya month ka reality check dega.' : salaryPercent >= 100 ? 'Salary se zyada kharch ho gaya. Calendar ko blame kar sakte ho, calculator ko nahi.' : salaryPercent >= 80 ? 'Month-end ko ab thoda space chahiye.' : salaryPercent >= 50 ? 'Halfway gone. Brake abhi bhi kaam karta hai.' : 'Wallet abhi comparatively theek chal raha hai.'}
                   </Text>
+                </View>
+
+                <View style={styles.safeDailyRow}>
+                  <View style={styles.safeDailyIcon}><Text style={styles.safeDailyEmoji}>🎯</Text></View>
+                  <View style={styles.flex}>
+                    <Text style={styles.safeDailyLabel}>AAJ SE ROZ APPROX SAFE</Text>
+                    <Text style={styles.safeDailyValue}>{salary > 0 ? currency(safeDaily) : 'Set salary first'}</Text>
+                    <Text style={styles.safeDailyHint}>{salary > 0 ? remainingDays + ' day' + (remainingDays === 1 ? '' : 's') + ' left. Budget suggestion hai, hukum nahi.' : 'Salary set karo aur app daily reality-check dega.'}</Text>
+                  </View>
                 </View>
 
                 <View style={styles.hero}>
