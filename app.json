@@ -7,7 +7,7 @@
     "userInterfaceStyle": "dark",
     "owner": "gutzx007s",
     "icon": "./dist/apple-icon.png",
-    "backgroundColor": "#07080B",
+    "backgroundColor": "#080506",
     "primaryColor": "#E5384F",
     "extra": {
       "eas": {
@@ -20,13 +20,13 @@
     },
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#07080B"
+      "backgroundColor": "#080506"
     },
     "web": {
       "favicon": "./public/icon.svg",
       "name": "FhooKkkDiya",
       "shortName": "FhooKkkDiya",
-      "themeColor": "#07080B"
+      "themeColor": "#080506"
     },
     "assetBundlePatterns": [
       "**/*"
