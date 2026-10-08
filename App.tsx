@@ -259,11 +259,77 @@ const getPunchline = (gaaliMode: boolean, index: number, total: number, count: n
     ] : []),
   ]
 
-  const pool = gaaliMode
+  const basePool = gaaliMode
     ? [...dynamic, ...cleanPunchlines, ...gaaliPunchlines, ...comedyCinemaPunchlines, ...cidReactionPunchlines, ...instagramMemePunchlines, ...desiRoastPunchlines, ...deadpanPunchlines]
     : [...dynamic, ...cleanPunchlines, ...comedyCinemaPunchlines, ...cidReactionPunchlines, ...instagramMemePunchlines, ...deadpanPunchlines]
 
-  return pool[index % pool.length]
+  const tierPool =
+    peakExpense >= 20000
+      ? [
+          '₹20,000. Hosh mein aao bhai. Final boss unlocked.',
+          'Poore ₹20,000? Abhijeet ko bulana padega.',
+          '₹20k expense detected. Account balance ne blackout le liya.',
+          ...cidReactionPunchlines,
+          ...desiRoastPunchlines,
+        ]
+      : peakExpense >= 18000
+        ? [
+            '₹' + peakExpense.toLocaleString('en-IN') + ' ek hi hit mein. Bas thoda aur aur final boss unlocked.',
+            '18k-plus single spend. Daya ko door se bula rahe hain.',
+            ...cidReactionPunchlines,
+            ...desiRoastPunchlines,
+          ]
+        : peakExpense >= 15000
+          ? [
+              '₹' + peakExpense.toLocaleString('en-IN') + ' ek hi hit mein. Hosh theek hai na?',
+              '15k-plus single spend. Investigation mode on.',
+              ...cidReactionPunchlines,
+              ...instagramMemePunchlines,
+            ]
+          : total >= 12000
+            ? [
+                '₹' + total.toLocaleString('en-IN') + ' today. Ab expense nahi, inquiry chal rahi hai.',
+                ...cidReactionPunchlines,
+                ...instagramMemePunchlines,
+              ]
+            : total >= 10000
+              ? [
+                  '₹' + total.toLocaleString('en-IN') + ' today? Salary ko yaad kar lo bhai.',
+                  ...instagramMemePunchlines,
+                  ...comedyCinemaPunchlines,
+                ]
+              : total >= 8000
+                ? [
+                    '₹' + total.toLocaleString('en-IN') + ' already. Wallet ko oxygen do.',
+                    ...instagramMemePunchlines,
+                    ...comedyCinemaPunchlines,
+                  ]
+                : total >= 6000
+                  ? [
+                      '₹' + total.toLocaleString('en-IN') + ' today. Case suspicious ho raha hai.',
+                      ...cidReactionPunchlines,
+                      ...instagramMemePunchlines,
+                    ]
+                  : total >= 4000
+                    ? [
+                        '₹' + total.toLocaleString('en-IN') + ' today. Investigation officially open.',
+                        ...cidReactionPunchlines,
+                      ]
+                    : total >= 2500
+                      ? [
+                          '₹' + total.toLocaleString('en-IN') + ' today. Kand ka trailer aa gaya.',
+                          ...instagramMemePunchlines,
+                          ...comedyCinemaPunchlines,
+                        ]
+                      : total >= 1000
+                        ? [
+                            '₹' + total.toLocaleString('en-IN') + ' today. Bhai thoda brake bhi use hota hai.',
+                            ...cleanPunchlines,
+                            ...instagramMemePunchlines,
+                          ]
+                        : basePool
+
+  return tierPool[index % tierPool.length]
 }
 
 const currency = (amount: number) => `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
@@ -547,6 +613,7 @@ export default function App() {
           <Animated.View pointerEvents="none" style={[styles.orb, { opacity: orbOpacity, transform: [{ scale: orbScale }] }]} />
           <Animated.View pointerEvents="none" style={[styles.orb2, { opacity: Animated.multiply(orbOpacity, 0.7), transform: [{ scale: orbScale }] }]} />
           <KeyboardAvoidingView style={styles.welcomeKeyboard} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <ScrollView contentContainerStyle={styles.welcomeScrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <Animated.View style={[styles.welcomeContent, { opacity: welcomeOpacity, transform: [{ translateY: welcomeY }] }]}>
             <TouchableOpacity onPress={triggerAvatar} activeOpacity={0.9}>
               <Animated.View style={[styles.avatarLargeWrap, { transform: [{ scale: avatarScale }] }]}>
@@ -602,6 +669,7 @@ export default function App() {
 
             <Text style={styles.welcomeFoot}>Data local storage mein. Salary aur expenses sirf isi device par rehte hain.</Text>
           </Animated.View>
+            </ScrollView>
           </KeyboardAvoidingView>
         </View>
       </SafeAreaView>
@@ -882,7 +950,8 @@ const styles = StyleSheet.create({
   welcomeScreen: { flex: 1, justifyContent: 'center', padding: 25, overflow: 'hidden', backgroundColor: colors.bg },
   orb: { position: 'absolute', width: 340, height: 340, borderRadius: 170, backgroundColor: colors.purple, opacity: 0.12, right: -130, top: -110 },
   orb2: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: colors.mint, opacity: 0.07, left: -140, bottom: -100 },
-  welcomeKeyboard: { width: '100%' },
+  welcomeKeyboard: { flex: 1, width: '100%' },
+  welcomeScrollContent: { flexGrow: 1, justifyContent: 'center', paddingVertical: 12 }
   welcomeContent: { width: '100%' },
   avatarLargeWrap: { width: 112, height: 112, borderRadius: 56, overflow: 'hidden', borderWidth: 2, borderColor: '#44376C', backgroundColor: '#151925', marginBottom: 18 },
   quoteCard: { marginTop: 16, padding: 15, borderRadius: 17, backgroundColor: '#0E1118', borderWidth: 1, borderColor: '#2A3040' },
