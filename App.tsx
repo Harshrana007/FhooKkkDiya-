@@ -60,53 +60,112 @@ const LEGACY_REMINDERS_KEY = '@spendly/reminders'
 const LEGACY_WELCOME_KEY = '@spendly/welcome-seen'
 
 const categories = ['Food', 'Chai', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Travel', 'Family', 'Other']
+
+// The comedy engine intentionally uses original lines inspired by familiar Indian-comedy
+// archetypes and meme culture rather than reproducing movie dialogue verbatim.
 const cleanPunchlines = [
-  'Paisa gaya. At least ab pata hai kahan gaya.',
-  'Wallet: bhai bas kar. Tu: ek last spend.',
-  'Zindagi short hai. Expense list surprisingly long.',
-  'Aaj ka mood: kharcha hua, hisaab bhi hua.',
-  'Kharcha chhota tha. Bank balance ka reaction bada tha.',
-  'Allah jaane paisa kahan jaata hai. FhooKkkDiya jaanta hai.',
-  'Kharchon ka hisaab rakho, warna kharchay tumhara hisaab rakh lenge.',
-  'Dekho beta, paisa hawa mein nahi gaya. Tumne hi udaaya hai.',
-  'Jaanne ki koshish karo: paisa gaya kahan? Saboot yahin pada hai.',
-  'Case solved. Culprit: tum.',
+  'Paisa gaya. At least is baar culprit pakda gaya: tum.',
+  'Wallet ne meeting bulayi hai. Agenda: tumhara questionable behaviour.',
+  'Kharcha hua. Hisaab hua. Regret pending hai.',
+  'Aaj ka budget dekh ke calculator bhi keh raha hai: main chalta hoon.',
+  'Money left the chat. Tumne usko khud kick maara.',
+  'Financial planning ka trailer aa gaya. Picture disaster hai.',
+  'Paisa hawa mein nahi gaya. Tumne usse personally escort kiya.',
+  'Aaj ka financial strategy: dekhte hain kya hota hai. Famous last words.',
+  'Account balance ne tumhe disappoint nahi kiya. Tumne usse disappoint kiya.',
+  'Expense list lambi hoti ja rahi hai. Kahani abhi baaki hai.',
+  'Budget tha. Phir tum aaye.',
+  'Wallet: ek last spend. Tum: bilkul. Also wallet: jhooth bol raha hai.',
+  'Ye kharcha chhota hai. Collective trauma nahi.',
+  'Aaj sirf paisa nahi gaya. Self-respect ka bhi ek hissa gaya.',
+  'Case solved. Suspect tum. Evidence expenses mein padha hai.',
 ]
 
 const gaaliPunchlines = [
-  'Abe MC, wallet ko oxygen de de. Har baar shopping pe ghusa deta hai.',
-  'Ye le BC, ek aur expense. Ab report khol ke shayari sun.',
-  'BC, ₹500 ki chai? Bhai chai thi ya IPO?',
-  'MC, ek last spend bol-bol ke poora bazaar khareed liya.',
-  'Wah BC wah. Paisa tha hi kitna jo itne confidence se uda diya?',
-  'Abe kya kar raha hai MC? Salary ko farewell de raha hai kya?',
-  'For fuck\'s sake, kharcha dekh ke calculator bhi resign kar raha hai.',
-  'Well shit. Bank balance ne seen kar diya.',
-  'Chal MC, entry maar. Kal phir bolenge budget kyun toot gaya.',
-  'BC ye expense nahi, emotional damage hai.',
-  'Abe yaar, paisa sambhal le. Tu kharchon ka Ashoka nahi hai.',
+  'Abe MC, wallet ko ICU kyun bhej raha hai?',
+  'BC, ye kharcha hai ya account pe personal attack?',
+  'MC, ek last spend bolte bolte poora bazaar khareed liya.',
+  'For fuck\'s sake, calculator bhi tumse distance maintain kar raha hai.',
+  'BC, budget ko funeral mein bhi tum hi late aaye ho.',
+  'Abe kya kar raha hai? Salary ko farewell tour pe bhej diya kya?',
+  'Well shit. Bank balance ne tumhara number block kar diya.',
+  'Chal MC, receipt sambhal. Kal isi se khud ko roast karenge.',
+  'BC ye financial planning nahi, organised bakchodi hai.',
+  'Abe yaar, paisa sambhal le. Tu RBI ka secret sponsor nahi hai.',
+  'MC, ₹500 ki chai ko itna emotional support kisne diya?',
+  'BC, account balance dekh ke lag raha hai kisi ne loot liya. Phir yaad aaya: tum hi the.',
+  'Fuck me, teesra expense bhi aa gaya. Tum rukega kab?',
+  'Abe BC, paisa bachana tha. Tumne usko freedom de di.',
+  'MC, ye spending streak tod de. Medal koi nahi de raha.',
+  'BC, wallet ki beizzati ki bhi koi limit hoti hai.',
+  'For fuck\'s sake, tum expense track nahi kar rahe. Tum evidence collect kar rahe ho.',
+  'Abe kya hustle hai bhai? Paisa aata hai aur turant gaayab ho jaata hai.',
 ]
 
-const filmyPunchlines = [
-  'Yeh paisa tumse kisne kaha tha ki itna udne ka?',
-  'Aaj hisaab hoga. Drama baad mein.',
-  'Dialogues bahut ho gaye. Ab receipt dikhao.',
-  'Scene simple hai: paisa kam, confidence zyada.',
-  'Picture abhi baaki hai, budget pehle hi over hai.',
-  'Hero tum ho. Villain bank balance hai.',
-  'Entry grand thi. Exit expense ne kar di.',
+const comedyCinemaPunchlines = [
+  'Baburao energy detected. Paisa kam, tension unlimited.',
+  'Plan aisa bana tha jaise duniya jeetni hai. Result: ₹0 savings.',
+  'Raju-level confidence. Account-level tragedy.',
+  'Welcome committee ne spending approve kar di. Committee tum khud the.',
+  'Majnu-level commitment: ek baar shopping shuru, phir seedha financial disaster.',
+  'Dhamaal ho gaya. Expense bhi aaya aur explanation bhi nahi.',
+  'Golmaal hai bhai. Paisa gaya, reason abhi missing hai.',
+  'Hungama complete. Teen expenses, paanch explanations, zero accountability.',
+  'Priyadarshan-level confusion: kharcha kisne kiya? Tum. Kya kharida? Accha sawaal.',
+  'Garam Masala situation: ek expense ko do bana diya, do ko chaar.',
+  'Chup Chup Ke spending pakdi gayi. Wallet sab dekh raha tha.',
+  'Bhagam Bhag mode: paisa bhaaga, tum uske peeche.',
+  'Fukrey economics: plan solid, budget imaginary.',
+  'Comedy classic nahi, financial tragedy hai.',
+  'Scene itna chaotic hai ki side character bhi budget advice de raha hai.',
+  'Aaj ka plot twist: tumne phir se "sirf dekhne" jaake khareed liya.',
+  'Director ne cut bola tha. Tumne card swipe kar diya.',
+  'Background music dramatic hai. Expense real hai.',
+  'Paisa gaya aur tumne acting shuru kar di: "yeh toh zaroori tha".',
+  'Interval aa gaya. Hero ka balance already interval pe hai.',
 ]
 
-const cidPunchlines = [
-  'Kuch toh gadbad hai, Daya. Expense list check karo.',
-  'Investigation complete. Paisa missing nahi, kharch hua hai.',
-  'Team, sabse pehle last transaction pe focus karo.',
-  'Case kaafi serious hai. Suspect khud user hai.',
-  'Evidence mil gaya. ₹ amount ne sab bata diya.',
+const deadpanPunchlines = [
+  'Excellent. Very responsible.',
+  'Outstanding financial decision. Truly inspiring.',
+  'Management would like to know why.',
+  'Congratulations. Money has been converted into vibes.',
+  'Very nice. Exactly what the budget needed.',
+  'This expense has been reviewed by absolutely nobody and approved by you.',
+  'We have examined the transaction. The transaction is stupid.',
+  'Financially speaking, this is certainly a choice.',
+  'Your wallet has requested a second opinion.',
+  'No further questions. The receipt is embarrassing enough.',
+  'Strong move. Terrible move. But strong.',
+  'Everything is under control. There is no control.',
 ]
 
-const getPunchline = (gaaliMode: boolean, index: number) => {
-  const pool = gaaliMode ? [...cleanPunchlines, ...gaaliPunchlines, ...filmyPunchlines, ...cidPunchlines] : [...cleanPunchlines, ...filmyPunchlines, ...cidPunchlines]
+const getPunchline = (gaaliMode: boolean, index: number, total: number, count: number) => {
+  const dynamic = [
+    ...(total >= 10000 ? [
+      '₹' + total.toLocaleString('en-IN') + ' already? Bhai ye expense tracker hai, IPL auction nahi.',
+      '₹' + total.toLocaleString('en-IN') + ' ka nuksaan dekh ke accountant ne chai mangwa li.',
+      '₹' + total.toLocaleString('en-IN') + ' uda diye. Bank balance ab witness protection mein hai.',
+    ] : []),
+    ...(total >= 5000 ? [
+      '₹' + total.toLocaleString('en-IN') + ' today. Budget ne ab tumhe block kar diya hai.',
+      'Five-thousand-plus club. Membership free thi, dignity nahi.',
+    ] : []),
+    ...(count >= 5 ? [
+      count + ' expenses today. Bhai tu shopping nahi, side quest spam kar raha hai.',
+      count + ' entries. Wallet ko aaj ka attendance award de do.',
+      'Itne kharche? Spreadsheet bhi tumse breakup karegi.',
+    ] : []),
+    ...(count >= 3 ? [
+      'Third expense detected. Coincidence naam ki cheez ab irrelevant hai.',
+      'Teen kharche already. Lagta hai wallet ne resignation notice de diya.',
+    ] : []),
+  ]
+
+  const pool = gaaliMode
+    ? [...dynamic, ...cleanPunchlines, ...gaaliPunchlines, ...comedyCinemaPunchlines, ...deadpanPunchlines]
+    : [...dynamic, ...cleanPunchlines, ...comedyCinemaPunchlines, ...deadpanPunchlines]
+
   return pool[index % pool.length]
 }
 
@@ -447,7 +506,7 @@ export default function App() {
                   <Text style={styles.total}>{currency(total)}</Text>
                   <Text style={styles.heroSub}>{todayExpenses.length ? `${todayExpenses.length} kharcha${todayExpenses.length === 1 ? '' : 'y'} recorded` : 'Aaj abhi tak paisa zinda hai. Mashallah.'}</Text>
                   <View style={styles.divider} />
-                  <Text style={styles.heroHint}>{getPunchline(gaaliMode, todayExpenses.length + expenses.length)}</Text>
+                  <Text style={styles.heroHint}>{getPunchline(gaaliMode, todayExpenses.length + expenses.length, total, todayExpenses.length)}</Text>
                 </View>
 
                 <View style={styles.rowBetween}>
