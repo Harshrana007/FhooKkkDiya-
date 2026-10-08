@@ -30,6 +30,9 @@ const checks = [
   ['react-native-svg pinned to 15.2.0', pkg.dependencies?.['react-native-svg'] === '15.2.0'],
   ['AsyncStorage pinned to 1.23.1', pkg.dependencies?.['@react-native-async-storage/async-storage'] === '1.23.1'],
   ['Node runtime is documented', pkg.engines?.node === '>=20.18.0'],
+  ['TypeScript compiler is pinned for CI', pkg.devDependencies?.typescript === '5.3.3'],
+  ['React type definitions are pinned', pkg.devDependencies?.['@types/react'] === '18.2.79'],
+  ['React DOM type definitions are pinned', pkg.devDependencies?.['@types/react-dom'] === '18.2.25'],
   ['No stale Reanimated Babel config', !fs.readFileSync('babel.config.js', 'utf8').includes('react-native-reanimated/plugin')],
 ]
 
