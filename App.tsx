@@ -845,7 +845,7 @@ export default function App() {
                   <View style={styles.badge}><Text style={styles.badgeNum}>{expenses.length}</Text><Text style={styles.muted}>entries</Text></View>
                 </View>
                 {expenses.map(expense => (
-                  <TouchableOpacity key={expense.id} onLongPress={() => deleteExpense(expense.id)} style={styles.expenseRow}>
+                  <TouchableOpacity key={expense.id} onLongPress={() => setDeleteCandidate(expense)} style={styles.expenseRow}>
                     <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.red} /></View>
                     <View style={styles.expenseCopy}><Text style={styles.expenseName}>{expense.description}</Text><Text style={styles.muted}>{expense.category} • {expense.date}</Text></View>
                     <Text style={styles.expenseAmount}>{currency(expense.amount)}</Text>
@@ -1041,6 +1041,15 @@ const styles = StyleSheet.create({
   welcomeFoot: { textAlign: 'center', color: '#725D62', fontSize: 11, marginTop: 13 },
 
   quickButton: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  keyboardArea: { flex: 1 },
+  screen: { flex: 1 },
+  scroll: { flex: 1 },
+  safeDailyRow: { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 18, backgroundColor: colors.maroonDeep, borderWidth: 1, borderColor: '#55202A', gap: 12 },
+  safeDailyIcon: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.maroonDeep, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#7A2734' },
+  safeDailyEmoji: { fontSize: 21 },
+  safeDailyLabel: { color: '#A98087', fontSize: 8, fontWeight: '900', letterSpacing: 1.4 },
+  safeDailyValue: { color: colors.text, fontSize: 21, fontWeight: '900', marginTop: 3 },
+  safeDailyHint: { color: colors.muted, fontSize: 10.5, lineHeight: 15, marginTop: 2 },
   quickText: { color: '#FF9BA8', fontSize: 12, fontWeight: '900' },
   salaryCard: { backgroundColor: '#13090C', borderRadius: 22, padding: 17, borderWidth: 1, borderColor: '#4D2028', gap: 13 },
   salaryBig: { color: colors.text, fontSize: 27, fontWeight: '900', marginTop: 4 },
@@ -1057,6 +1066,10 @@ const styles = StyleSheet.create({
   salaryHint: { color: '#A98188', fontSize: 10.5, lineHeight: 16 },
   salaryEditRow: { flexDirection: 'row', gap: 9, alignItems: 'center' },
   salarySaveButton: { minHeight: 48, paddingHorizontal: 17, borderRadius: 13, backgroundColor: colors.red, alignItems: 'center', justifyContent: 'center' },
+  toggle: { width: 48, height: 28, borderRadius: 16, padding: 3, justifyContent: 'center', backgroundColor: '#3C2228' },
+  toggleOn: { backgroundColor: colors.red },
+  knob: { width: 22, height: 22, borderRadius: 11, backgroundColor: colors.white },
+  knobOn: { alignSelf: 'flex-end' },
   hero: { position: 'relative', overflow: 'hidden', backgroundColor: colors.surface2, borderRadius: 25, padding: 22, borderWidth: 1, borderColor: '#282F40' },
   heroGlow: { position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: colors.red, opacity: 0.1, right: -70, top: -80 },
   label: { color: '#9B7D83', fontSize: 9, fontWeight: '900', letterSpacing: 1.6 },
