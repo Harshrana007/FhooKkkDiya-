@@ -531,6 +531,9 @@ export default function App() {
   const peakTodayExpense = todayExpenses.reduce((max, e) => Math.max(max, e.amount), 0)
   const salaryRemaining = salary - monthTotal
   const salaryPercent = salary > 0 ? Math.round((monthTotal / salary) * 100) : 0
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+  const remainingDays = Math.max(1, monthEnd.getDate() - today.getDate() + 1)
+  const safeDaily = salary > 0 ? Math.max(0, salaryRemaining / remainingDays) : 0
 
   const categoryTotals = useMemo(
     () => categories.map(name => ({
