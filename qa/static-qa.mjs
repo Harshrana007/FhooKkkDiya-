@@ -4,6 +4,13 @@ const app = fs.readFileSync('App.tsx', 'utf8')
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const expo = JSON.parse(fs.readFileSync('app.json', 'utf8'))
 
+const styleStart = app.indexOf('const styles = StyleSheet.create({')
+const styleRefs = [...new Set([...app.matchAll(/styles\\.([A-Za-z0-9_]+)/g)].map(match => match[1]))]
+const styleKeys = styleStart >= 0
+  ? [...new Set([...app.slice(styleStart).matchAll(/^\\s{2}([A-Za-z0-9_]+):/gm)].map(match => match[1]))]
+  : []
+const missingStyles = styleRefs.filter(name => !styleKeys.includes(name))
+
 const assertions = [
   ['App.tsx has no stale Reanimated config', !app.includes('react-native-reanimated/plugin')],
   ['App.tsx has no stale Expo Router import', !app.includes('expo-router')],
@@ -22,6 +29,8 @@ const assertions = [
   ['Toast feedback exists', app.includes('const showToast') && app.includes('styles.toast')],
   ['Onboarding is scroll-safe', app.includes('styles.welcomeScrollContent')],
   ['No misleading reminder toggle remains', !app.includes('Roz ka hisaab') && !app.includes('REMINDERS_KEY')],
+  ['Every styles.* reference has a StyleSheet key', missingStyles.length === 0],
+  ['No orphaned delete handler remains', !app.includes('deleteExpense(')],
   ['Red-maroon theme is defined', app.includes("red: '#E5384F'") && app.includes("maroon: '#6E1C2A'")],
   ['Package and Expo versions match', pkg.version === expo.expo.version],
   ['Expo primary color matches the new theme', expo.expo.primaryColor === '#E5384F'],
