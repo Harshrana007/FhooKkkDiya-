@@ -2,31 +2,31 @@
   "expo": {
     "name": "FhooKkkDiya",
     "slug": "fhookkkdiya",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "owner": "gutzx007s",
     "icon": "./dist/apple-icon.png",
-    "backgroundColor": "#07080B",
-    "primaryColor": "#9B7CFF",
+    "backgroundColor": "#080506",
+    "primaryColor": "#E5384F",
     "extra": {
       "eas": {
         "projectId": "940fa81f-d41d-4501-ae2f-8703d7044443"
       }
     },
     "android": {
-      "package": "com.anonymous.myapp",
+      "package": "com.gutzx007s.fhookkkdiya",
       "icon": "./dist/apple-icon.png"
     },
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#07080B"
+      "backgroundColor": "#080506"
     },
     "web": {
       "favicon": "./public/icon.svg",
       "name": "FhooKkkDiya",
       "shortName": "FhooKkkDiya",
-      "themeColor": "#07080B"
+      "themeColor": "#080506"
     },
     "assetBundlePatterns": [
       "**/*"

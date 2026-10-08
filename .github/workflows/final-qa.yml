@@ -1,0 +1,35 @@
+name: Final QA
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  static-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Parse TypeScript source
+        run: npx prettier@3 App.tsx --parser typescript > /dev/null
+
+      - name: Parse and normalize config source
+        run: npx prettier@3 --write app.json package.json babel.config.js index.js > /dev/null
+
+      - name: Validate JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('app.json','utf8')); JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('JSON OK')"
+
+      - name: Run dependency audit
+        run: node qa/dependency-audit.mjs
+
+      - name: Run product QA assertions
+        run: node qa/static-qa.mjs
