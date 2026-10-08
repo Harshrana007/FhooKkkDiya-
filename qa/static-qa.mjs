@@ -36,6 +36,7 @@ const assertions = [
   ['Delete confirmation exists', app.includes('Evidence delete karein?')],
   ['Toast feedback exists', app.includes('const showToast') && app.includes('styles.toast')],
   ['Onboarding is scroll-safe', app.includes('styles.welcomeScrollContent')],
+  ['Invalid onboarding salary blocks exit', app.includes('trimmedSalary && !saveSalary(trimmedSalary)')],
   ['Opening logo matches launcher asset', app.includes("require('./dist/apple-icon.png')") && app.includes('styles.bootLogo') && app.includes('bootLogoScale')],
   ['Onboarding crash fix: punchline helper has no component-local date calculation', !punchlineBody.includes('today.getFullYear') && !punchlineBody.includes('today.getMonth') && !punchlineBody.includes('today.getDate')],
   ['Onboarding crash fix: punchline helper has no component-local salaryRemaining reference', !punchlineBody.includes('salaryRemaining')],
