@@ -46,7 +46,23 @@ jobs:
             const comment = ['### Temporary TypeScript compiler output', '', '```text', body.slice(0, 18000), '```'].join('\n')
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: comment })
       - name: Web bundle smoke test
-        run: npx expo@51 export --platform web --output-dir .expo-web-smoke
+        id: web
+        shell: bash
+        run: |
+          set +e
+          npx expo@51 export --platform web --output-dir .expo-web-smoke 2>&1 | tee /tmp/web.log
+          status=${PIPESTATUS[0]}
+          exit ${status}
+
+      - name: Web build error report
+        if: failure() && steps.web.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const body = fs.existsSync('/tmp/web.log') ? fs.readFileSync('/tmp/web.log', 'utf8') : 'No web build log captured.'
+            const comment = ['### Temporary web bundle output', '', '```text', body.slice(0, 18000), '```'].join('\n')
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: comment })
 
       - name: Parse TypeScript source
         run: npx prettier@3 App.tsx --parser typescript > /dev/null
