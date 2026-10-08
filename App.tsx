@@ -12,6 +12,9 @@ type Expense = { id: number; amount: number; description: string; category: stri
 const EXPENSES_KEY = '@fhookkdiya/expenses'
 const REMINDERS_KEY = '@fhookkdiya/reminders'
 const WELCOME_KEY = '@fhookkdiya/welcome-seen'
+const LEGACY_EXPENSES_KEY = '@spendly/expenses'
+const LEGACY_REMINDERS_KEY = '@spendly/reminders'
+const LEGACY_WELCOME_KEY = '@spendly/welcome-seen'
 
 const categories = ['Food', 'Chai', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Travel', 'Family', 'Other']
 const punchlines = [
@@ -55,18 +58,33 @@ export default function App() {
     let mounted = true
     ;(async () => {
       try {
-        const [savedExpenses, savedReminders, welcomeSeen] = await Promise.all([
+        const [savedExpensesNew, savedRemindersNew, welcomeSeenNew, savedExpensesLegacy, savedRemindersLegacy, welcomeSeenLegacy] = await Promise.all([
           AsyncStorage.getItem(EXPENSES_KEY),
           AsyncStorage.getItem(REMINDERS_KEY),
           AsyncStorage.getItem(WELCOME_KEY),
+          AsyncStorage.getItem(LEGACY_EXPENSES_KEY),
+          AsyncStorage.getItem(LEGACY_REMINDERS_KEY),
+          AsyncStorage.getItem(LEGACY_WELCOME_KEY),
         ])
+        const savedExpenses = savedExpensesNew ?? savedExpensesLegacy
+        const savedReminders = savedRemindersNew ?? savedRemindersLegacy
+        const welcomeSeen = welcomeSeenNew ?? welcomeSeenLegacy
         if (!mounted) return
         if (savedExpenses) {
           const parsed = JSON.parse(savedExpenses)
-          if (Array.isArray(parsed)) setExpenses(parsed)
+          if (Array.isArray(parsed)) {
+            setExpenses(parsed)
+            if (!savedExpensesNew && parsed.length) {
+              AsyncStorage.setItem(EXPENSES_KEY, JSON.stringify(parsed)).catch(() => {})
+            }
+          }
         }
-        if (savedReminders !== null) setReminders(savedReminders === 'true')
+        if (savedReminders !== null) {
+          setReminders(savedReminders === 'true')
+          if (savedRemindersNew === null) AsyncStorage.setItem(REMINDERS_KEY, savedReminders).catch(() => {})
+        }
         setWelcomeVisible(welcomeSeen !== 'true')
+        if (!welcomeSeenNew && welcomeSeenLegacy === 'true') AsyncStorage.setItem(WELCOME_KEY, 'true').catch(() => {})
       } finally {
         if (mounted) setStorageReady(true)
       }
