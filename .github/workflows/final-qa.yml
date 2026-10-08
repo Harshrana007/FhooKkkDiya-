@@ -32,6 +32,15 @@ jobs:
           exit ${status}
 
 
+      - name: Report TypeScript errors to PR
+        if: failure() && steps.tsc.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const body = fs.existsSync('/tmp/tsc.log') ? fs.readFileSync('/tmp/tsc.log', 'utf8') : 'No TypeScript log captured.'
+            const comment = ['### Temporary TypeScript smoke-test report', '', '```text', body.slice(0, 12000), '```'].join('\n')
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: comment })
       - name: Web bundle smoke test
         run: npx expo@51 export --platform web --output-dir .expo-web-smoke
 
