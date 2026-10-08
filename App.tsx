@@ -4,7 +4,7 @@ import { Alert, Animated, Easing, Image, KeyboardAvoidingView, Platform, SafeAre
 import { SvgXml } from 'react-native-svg'
 import { StatusBar } from 'expo-status-bar'
 
-const APP_LOGO = require('./dist/apple-icon.png')
+const APP_LOGO = require('./assets/app-icon.png')
 
 const GUTZ_AVATAR_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\">\n  <defs>\n    <linearGradient id=\"bg\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"1\"><stop stop-color=\"#191326\"/><stop offset=\"1\" stop-color=\"#090b11\"/></linearGradient>\n  </defs>\n  <rect width=\"128\" height=\"128\" rx=\"32\" fill=\"url(#bg)\"/>\n  <circle cx=\"64\" cy=\"66\" r=\"34\" fill=\"#e9e1ce\"/>\n  <path d=\"M31 54c2-27 14-39 21-42 2 10 6 13 11 5 4 10 10 3 14-9 4 9 10 12 16 1 4 12 12 11 16 3 2 15 1 27-3 40-10-12-21-16-37-16-15 0-28 5-38 18z\" fill=\"#121116\"/>\n  <path d=\"M44 49c3-13 9-19 20-22 12 2 21 8 25 22-7-6-14-9-25-9-9 0-14 3-20 9z\" fill=\"#ffffff\" opacity=\".65\"/>\n  <circle cx=\"53\" cy=\"67\" r=\"5\" fill=\"#17151a\"/>\n  <circle cx=\"76\" cy=\"67\" r=\"5\" fill=\"#17151a\"/>\n  <path d=\"M56 83c5 4 15 4 20 0\" fill=\"none\" stroke=\"#1a171b\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n  <path d=\"M30 78c12 9 21 12 34 13 12 0 23-3 34-12\" fill=\"none\" stroke=\"#0d0d11\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <path d=\"M50 99c7 6 20 6 28 0\" fill=\"none\" stroke=\"#0d0d11\" stroke-width=\"6\" stroke-linecap=\"round\"/>\n</svg>"
 
