@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm exec expo export --platform web",
-  "outputDirectory": "dist",
+  "buildCommand": "npx expo export --platform web --output-dir .vercel-dist",
+  "outputDirectory": ".vercel-dist",
   "framework": null
 }
