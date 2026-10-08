@@ -126,6 +126,53 @@ const comedyCinemaPunchlines = [
   'Interval aa gaya. Hero ka balance already interval pe hai.',
 ]
 
+const cidReactionPunchlines = [
+  'Hosh mein aao Abhijeet. Account balance dekho.',
+  'Abhijeet, kuch toh gadbad hai. Receipt phir mil gayi.',
+  'Daya ko bulao. Expense limit cross hone wali hai.',
+  'Daya, darwaza nahi. Wallet kholo.',
+  'Case serious hai. Suspect: tum. Evidence: transaction history.',
+  'CID team ne investigation shuru kar di. Paisa already nikal chuka hai.',
+  'ACP saab, scene ulta hai. Kharcha hua aur reason nahi mila.',
+  'Crime scene secure karo. Ye shopping cart normal nahi hai.',
+  'Motive unclear. Spending pattern highly suspicious.',
+];
+
+const instagramMemePunchlines = [
+  'Aayein? Itna kaise uda diya?',
+  'Bhai sahab. Ye kis line mein aa gaye ho?',
+  'Moye moye. Wallet ka.',
+  'Emotional damage. Financial damage. Bonus mein.',
+  'POV: salary aayi thi.',
+  'POV: tumne bola tha bas ek cheez leni hai.',
+  'Bro is cooked. Wallet bhi.',
+  'Main toh bas dekh raha tha. Receipt: jhooth.',
+  'Kya hi bolun. Transaction khud jawab nahi de raha.',
+  'Bhai, control. Card ko bhi thoda rest chahiye.',
+  'Ye dekh ke system ne bhi do second socha.',
+  'Absolute cinema. Zero financial planning.',
+  'Bhai ruk ja. Plot already enough hai.',
+  'Khatam. Tata. Bye-bye. Monthly peace.',
+  'Arre baap re. Ye toh alag hi level ka kand hai.',
+];
+
+const desiRoastPunchlines = [
+  'Abe ' + String.fromCharCode(77,67) + ', wallet ko ICU kyun bhej raha hai?',
+  String.fromCharCode(66,67) + ', ye kharcha hai ya account pe personal attack?',
+  'Nikal ' + String.fromCharCode(108,97,117,118,114,101) + '. Budget meeting khatam.',
+  'Ye le ' + String.fromCharCode(108,97,117,118,114,101) + ' mode. Receipt phir se padh.',
+  'Abe bhai, ek imaginary rapta maarne ka mann ho raha hai. Expense dekh ke.',
+  'Paisa tera tha, dimaag kisne suspend kiya tha?',
+  'Itni bakchodi bhi EMI pe aati hai kya?',
+  'Bhai tu kharcha track nahi kar raha. Evidence collect kar raha hai.',
+  'Aaj wallet ne tumhe dekha aur bola: bas kar.',
+  'Ek aur expense aur budget officially RIP.',
+  'Aukat se bahar spending ko confidence ke saath karne ka medal milta hai kya?',
+  'Receipt dekh ke bhi keh raha hai "zaroori tha". Haan bhai, zaroori tha.',
+  'Wallet ki taraf se formal complaint aa gayi hai.',
+  'Bhai, paisa bachana tha. Tumne usko azaadi de di.',
+];
+
 const deadpanPunchlines = [
   'Excellent. Very responsible.',
   'Outstanding financial decision. Truly inspiring.',
@@ -141,9 +188,43 @@ const deadpanPunchlines = [
   'Everything is under control. There is no control.',
 ]
 
-const getPunchline = (gaaliMode: boolean, index: number, total: number, count: number, monthTotal = 0, salary = 0) => {
+const getPunchline = (gaaliMode: boolean, index: number, total: number, count: number, monthTotal = 0, salary = 0, peakExpense = 0) => {
   const salaryPercent = salary > 0 ? Math.round((monthTotal / salary) * 100) : 0
   const dynamic = [
+    ...(peakExpense >= 20000 ? [
+      '₹20,000. Bhai, hosh mein aao. Ye final boss hai.',
+      'Poore ₹20,000? Abhijeet ko bulana padega.',
+      '₹20k expense detected. Account balance ne aankhon ke saamne blackout kar liya.',
+    ] : []),
+    ...(peakExpense >= 18000 && peakExpense < 20000 ? [
+      `₹${peakExpense.toLocaleString('en-IN')} ka single expense. Bas ₹${(20000 - peakExpense).toLocaleString('en-IN')} aur aur final boss unlocked.`,
+      'Bhai 18k-plus? Budget ab tumhe seriously dekh raha hai.',
+    ] : []),
+    ...(peakExpense >= 15000 && peakExpense < 18000 ? [
+      `₹${peakExpense.toLocaleString('en-IN')} ek hi hit mein. Hosh theek hai na?`,
+      '15k-plus single spend. Daya ko door se bula rahe hain.',
+    ] : []),
+    ...(total >= 12000 && total < 15000 ? [
+      '₹' + total.toLocaleString('en-IN') + ' today. Ab expense nahi, inquiry chal rahi hai.',
+    ] : []),
+    ...(total >= 10000 && total < 12000 ? [
+      '₹' + total.toLocaleString('en-IN') + ' today? Salary ko yaad kar lo bhai.',
+    ] : []),
+    ...(total >= 8000 && total < 10000 ? [
+      '₹' + total.toLocaleString('en-IN') + ' already. Wallet ko thoda oxygen do.',
+    ] : []),
+    ...(total >= 6000 && total < 8000 ? [
+      '₹' + total.toLocaleString('en-IN') + ' today. Case suspicious ho raha hai.',
+    ] : []),
+    ...(total >= 4000 && total < 6000 ? [
+      '₹' + total.toLocaleString('en-IN') + ' today. Investigation officially open.',
+    ] : []),
+    ...(total >= 2500 && total < 4000 ? [
+      '₹' + total.toLocaleString('en-IN') + ' today. Kand ka trailer aa gaya.',
+    ] : []),
+    ...(total >= 1000 && total < 2500 ? [
+      '₹' + total.toLocaleString('en-IN') + ' today. Bhai thoda brake bhi use hota hai.',
+    ] : []),
     ...(salary >= 1 && salaryPercent >= 100 ? [
       `Salary ka ${salaryPercent}% touch ho gaya. Month abhi baaki hai, boss.`,
       'Monthly salary ne resignation letter draft kar diya hai.',
@@ -179,8 +260,8 @@ const getPunchline = (gaaliMode: boolean, index: number, total: number, count: n
   ]
 
   const pool = gaaliMode
-    ? [...dynamic, ...cleanPunchlines, ...gaaliPunchlines, ...comedyCinemaPunchlines, ...deadpanPunchlines]
-    : [...dynamic, ...cleanPunchlines, ...comedyCinemaPunchlines, ...deadpanPunchlines]
+    ? [...dynamic, ...cleanPunchlines, ...gaaliPunchlines, ...comedyCinemaPunchlines, ...cidReactionPunchlines, ...instagramMemePunchlines, ...desiRoastPunchlines, ...deadpanPunchlines]
+    : [...dynamic, ...cleanPunchlines, ...comedyCinemaPunchlines, ...cidReactionPunchlines, ...instagramMemePunchlines, ...deadpanPunchlines]
 
   return pool[index % pool.length]
 }
@@ -384,6 +465,7 @@ export default function App() {
   const thisMonth = monthKey(today)
   const monthExpenses = expenses.filter(e => e.date?.slice(0, 7) === thisMonth)
   const monthTotal = monthExpenses.reduce((sum, e) => sum + e.amount, 0)
+  const peakTodayExpense = todayExpenses.reduce((max, e) => Math.max(max, e.amount), 0)
   const salaryRemaining = salary - monthTotal
   const salaryPercent = salary > 0 ? Math.round((monthTotal / salary) * 100) : 0
 
@@ -597,7 +679,7 @@ export default function App() {
                   <Text style={styles.total}>{currency(total)}</Text>
                   <Text style={styles.heroSub}>{todayExpenses.length ? `${todayExpenses.length} kharcha${todayExpenses.length === 1 ? '' : 'y'} recorded` : 'Aaj abhi tak paisa zinda hai. Mashallah.'}</Text>
                   <View style={styles.divider} />
-                  <Text style={styles.heroHint}>{getPunchline(gaaliMode, todayExpenses.length + expenses.length, total, todayExpenses.length, monthTotal, salary)}</Text>
+                  <Text style={styles.heroHint}>{getPunchline(gaaliMode, todayExpenses.length + expenses.length, total, todayExpenses.length, monthTotal, salary, peakTodayExpense)}</Text>
                 </View>
 
                 <View style={styles.rowBetween}>
