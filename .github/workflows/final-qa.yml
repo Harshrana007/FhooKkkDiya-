@@ -23,24 +23,8 @@ jobs:
         run: npx expo@51 config --type public > /dev/null
 
       - name: TypeScript check
-        id: tsc
-        shell: bash
-        run: |
-          set +e
-          npx tsc --noEmit --pretty false 2>&1 | tee /tmp/tsc.log
-          status=${PIPESTATUS[0]}
-          exit ${status}
+        run: npx -p typescript@5.3.3 tsc --noEmit --pretty false
 
-
-      - name: Report TypeScript errors to PR
-        if: failure() && steps.tsc.outcome == 'failure'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs')
-            const body = fs.existsSync('/tmp/tsc.log') ? fs.readFileSync('/tmp/tsc.log', 'utf8') : 'No TypeScript log captured.'
-            const comment = ['### Temporary TypeScript smoke-test report', '', '```text', body.slice(0, 12000), '```'].join('\n')
-            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: comment })
       - name: Web bundle smoke test
         run: npx expo@51 export --platform web --output-dir .expo-web-smoke
 
