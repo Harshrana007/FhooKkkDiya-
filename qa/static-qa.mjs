@@ -5,9 +5,9 @@ const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const expo = JSON.parse(fs.readFileSync('app.json', 'utf8'))
 
 const styleStart = app.indexOf('const styles = StyleSheet.create({')
-const styleRefs = [...new Set([...app.matchAll(/styles\\.([A-Za-z0-9_]+)/g)].map(match => match[1]))]
+const styleRefs = [...new Set([...app.matchAll(/styles\.([A-Za-z0-9_]+)/g)].map(match => match[1]))]
 const styleKeys = styleStart >= 0
-  ? [...new Set([...app.slice(styleStart).matchAll(/^\\s{2}([A-Za-z0-9_]+):/gm)].map(match => match[1]))]
+  ? [...new Set([...app.slice(styleStart).matchAll(/^\s{2}([A-Za-z0-9_]+):/gm)].map(match => match[1]))]
   : []
 const missingStyles = styleRefs.filter(name => !styleKeys.includes(name))
 
