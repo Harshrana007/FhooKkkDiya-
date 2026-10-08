@@ -21,6 +21,7 @@ The app is intentionally simple: add an expense, assign a category, track todayâ
 - Expo
 - TypeScript
 - AsyncStorage
+- React Native Reanimated
 - React Native Web
 
 ## Project Structure
@@ -130,3 +131,7 @@ This repository does not currently include an explicit license file. If you plan
 - CSV export/import
 - editable or removable expense entries
 - cloud sync and multi-device support
+
+## Animation and welcome experience
+
+The first-run welcome screen uses React Native Reanimated for the entrance, avatar spring, ambient orb motion, and button press feedback. The Gutz avatar is bundled locally with the app, so it does not depend on a network request.

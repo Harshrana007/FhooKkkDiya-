@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   Alert,
-  Animated,
-  Easing,
+  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -13,6 +12,15 @@ import {
   View,
 } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated'
 
 type Tab = 'today' | 'history' | 'reports' | 'settings'
 type Expense = { id: number; amount: number; description: string; category: string; date: string }
@@ -44,12 +52,11 @@ export default function App() {
   const [storageReady, setStorageReady] = useState(false)
   const [welcomeVisible, setWelcomeVisible] = useState(false)
 
-  const screenAnim = useRef(new Animated.Value(1)).current
-  const welcomeOpacity = useRef(new Animated.Value(0)).current
-  const welcomeY = useRef(new Animated.Value(28)).current
-  const orbScale = useRef(new Animated.Value(0.88)).current
-  const orbOpacity = useRef(new Animated.Value(0.35)).current
-  const buttonScale = useRef(new Animated.Value(1)).current
+  const screenProgress = useSharedValue(1)
+  const welcomeProgress = useSharedValue(0)
+  const orbPulse = useSharedValue(0)
+  const buttonScale = useSharedValue(1)
+  const avatarScale = useSharedValue(0.86)
 
   useEffect(() => {
     let mounted = true
@@ -110,107 +117,100 @@ export default function App() {
     })
   }, [reminders, storageReady])
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(screenAnim, {
-        toValue: 1,
-        duration: 420,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start()
-  }, [tab, screenAnim])
+  const screenStyle = useAnimatedStyle(() => ({
+    opacity: screenProgress.value,
+    transform: [{ translateY: (1 - screenProgress.value) * 10 }],
+  }))
+
+  const welcomeContentStyle = useAnimatedStyle(() => ({
+    opacity: welcomeProgress.value,
+    transform: [{ translateY: (1 - welcomeProgress.value) * 28 }],
+  }))
+
+  const welcomeOrbStyle = useAnimatedStyle(() => ({
+    opacity: 0.35 + orbPulse.value * 0.27,
+    transform: [{ scale: 0.88 + orbPulse.value * 0.18 }],
+  }))
+
+  const welcomeOrbSmallStyle = useAnimatedStyle(() => ({
+    opacity: 0.24 + orbPulse.value * 0.18,
+    transform: [{ scale: 0.92 + orbPulse.value * 0.12 }],
+  }))
+
+  const welcomeAvatarStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: avatarScale.value }],
+  }))
+
+  const welcomeButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: buttonScale.value }],
+  }))
 
   useEffect(() => {
-    if (!welcomeVisible) return
+    screenProgress.value = 0
+    screenProgress.value = withTiming(1, {
+      duration: 320,
+      easing: Easing.out(Easing.cubic),
+    })
+  }, [tab, screenProgress])
 
-    Animated.parallel([
-      Animated.timing(welcomeOpacity, {
-        toValue: 1,
-        duration: 650,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.spring(welcomeY, {
-        toValue: 0,
-        friction: 8,
-        tension: 55,
-        useNativeDriver: true,
-      }),
-    ]).start()
+  useEffect(() => {
+    if (!welcomeVisible) {
+      cancelAnimation(orbPulse)
+      return
+    }
 
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.parallel([
-          Animated.timing(orbScale, {
-            toValue: 1.06,
-            duration: 1800,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(orbOpacity, {
-            toValue: 0.62,
-            duration: 1800,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ]),
-        Animated.parallel([
-          Animated.timing(orbScale, {
-            toValue: 0.88,
-            duration: 1800,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(orbOpacity, {
-            toValue: 0.35,
-            duration: 1800,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ]),
-      ]),
+    welcomeProgress.value = 0
+    avatarScale.value = 0.84
+
+    welcomeProgress.value = withSpring(1, {
+      damping: 16,
+      stiffness: 150,
+      mass: 0.8,
+    })
+    avatarScale.value = withSpring(1, {
+      damping: 13,
+      stiffness: 165,
+      mass: 0.8,
+    })
+    orbPulse.value = withRepeat(
+      withTiming(1, {
+        duration: 2200,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1,
+      true,
     )
 
-    pulse.start()
+    return () => cancelAnimation(orbPulse)
+  }, [welcomeVisible, welcomeProgress, avatarScale, orbPulse, screenProgress])
 
-    return () => pulse.stop()
-  }, [welcomeVisible, welcomeOpacity, welcomeY, orbScale, orbOpacity])
-
-  const enterApp = async () => {
-    Animated.parallel([
-      Animated.timing(welcomeOpacity, {
-        toValue: 0,
-        duration: 260,
-        useNativeDriver: true,
-      }),
-      Animated.timing(welcomeY, {
-        toValue: -18,
-        duration: 260,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start(async () => {
+  const enterApp = () => {
+    welcomeProgress.value = withTiming(0, {
+      duration: 240,
+      easing: Easing.in(Easing.cubic),
+    })
+    avatarScale.value = withTiming(0.84, { duration: 240 })
+    setTimeout(() => {
       setWelcomeVisible(false)
-      await AsyncStorage.setItem(WELCOME_STORAGE_KEY, 'true')
+      AsyncStorage.setItem(WELCOME_STORAGE_KEY, 'true').catch(() => undefined)
+    }, 240)
+  }
+
+  const pressIn = () => {
+    buttonScale.value = withSpring(0.97, {
+      damping: 12,
+      stiffness: 250,
+      mass: 0.45,
     })
   }
 
-  const pressIn = () =>
-    Animated.spring(buttonScale, {
-      toValue: 0.97,
-      friction: 8,
-      tension: 120,
-      useNativeDriver: true,
-    }).start()
-
-  const pressOut = () =>
-    Animated.spring(buttonScale, {
-      toValue: 1,
-      friction: 7,
-      tension: 110,
-      useNativeDriver: true,
-    }).start()
+  const pressOut = () => {
+    buttonScale.value = withSpring(1, {
+      damping: 12,
+      stiffness: 240,
+      mass: 0.45,
+    })
+  }
 
   const todayExpenses = expenses.filter((expense) => expense.date === todayKey)
   const total = todayExpenses.reduce((sum, expense) => sum + expense.amount, 0)
@@ -289,9 +289,11 @@ export default function App() {
       <SafeAreaView style={styles.safe}>
         <StatusBar style="light" />
         <View style={styles.boot}>
-          <View style={styles.logoMark}>
-            <Text style={styles.logoMarkText}>₹</Text>
-          </View>
+          <Image
+            source={require('./assets/gutz-avatar-128.jpg')}
+            style={styles.bootAvatar}
+            accessibilityLabel="Gutz avatar"
+          />
           <Text style={styles.bootTitle}>Spendly</Text>
           <Text style={styles.bootText}>Getting your money space ready.</Text>
         </View>
@@ -308,39 +310,36 @@ export default function App() {
             pointerEvents="none"
             style={[
               styles.orb,
-              {
-                opacity: orbOpacity,
-                transform: [{ scale: orbScale }],
-              },
+              welcomeOrbStyle,
             ]}
           />
           <Animated.View
             pointerEvents="none"
             style={[
               styles.orbSmall,
-              {
-                opacity: Animated.multiply(orbOpacity, 0.7),
-                transform: [{ scale: orbScale }],
-              },
+              welcomeOrbSmallStyle,
             ]}
           />
 
           <Animated.View
             style={[
               styles.welcomeContent,
-              {
-                opacity: welcomeOpacity,
-                transform: [{ translateY: welcomeY }],
-              },
+              welcomeContentStyle,
             ]}
           >
-            <View style={styles.welcomeLogo}>
-              <Text style={styles.welcomeLogoText}>₹</Text>
-            </View>
+            <Animated.View style={[styles.welcomeAvatarFrame, welcomeAvatarStyle]}>
+              <Image
+                source={require('./assets/gutz-avatar-128.jpg')}
+                style={styles.welcomeAvatar}
+                resizeMode="cover"
+                accessibilityLabel="Gutz avatar"
+              />
+              <View style={styles.avatarStatus} />
+            </Animated.View>
 
-            <Text style={styles.welcomeKicker}>A QUIET PLACE FOR YOUR MONEY</Text>
-            <Text style={styles.welcomeTitle}>Hi 9ickie.</Text>
-            <Text style={styles.welcomeHeadline}>Welcome to Spendly.</Text>
+            <Text style={styles.welcomeKicker}>GOOD TO SEE YOU</Text>
+            <Text style={styles.welcomeTitle}>Hi Gutz.</Text>
+            <Text style={styles.welcomeHeadline}>Welcome back to Spendly.</Text>
             <Text style={styles.welcomeCopy}>
               Capture the small spends, see the bigger picture, and stay in control without turning money into a chore.
             </Text>
@@ -351,7 +350,7 @@ export default function App() {
               <View style={styles.welcomePill}><Text style={styles.welcomePillText}>SIMPLE</Text></View>
             </View>
 
-            <Animated.View style={{ transform: [{ scale: buttonScale }], width: '100%' }}>
+            <Animated.View style={[styles.welcomeButtonWrap, welcomeButtonStyle]}>
               <TouchableOpacity
                 activeOpacity={0.9}
                 onPressIn={pressIn}
@@ -376,8 +375,13 @@ export default function App() {
       <StatusBar style="light" />
       <View style={styles.app}>
         <View style={styles.header}>
-          <View style={styles.brandIcon}>
-            <Text style={styles.brandIconText}>₹</Text>
+          <View style={styles.headerAvatarFrame}>
+            <Image
+              source={require('./assets/gutz-avatar-128.jpg')}
+              style={styles.headerAvatar}
+              resizeMode="cover"
+              accessibilityLabel="Gutz avatar"
+            />
           </View>
           <View style={styles.brandCopy}>
             <Text style={styles.eyebrow}>PERSONAL EXPENSES</Text>
@@ -386,22 +390,7 @@ export default function App() {
           <View style={styles.liveDot} />
         </View>
 
-        <Animated.View
-          style={[
-            styles.screen,
-            {
-              opacity: screenAnim,
-              transform: [
-                {
-                  translateY: screenAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [10, 0],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
+        <Animated.View style={[styles.screen, screenStyle]}>
           <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
             {tab === 'today' && (
               <>
@@ -650,7 +639,15 @@ const colors = {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   app: { flex: 1, backgroundColor: colors.bg },
-  boot: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
+  boot: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg, padding: 26 },
+  bootAvatar: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    borderWidth: 2,
+    borderColor: '#6F59C7',
+    marginBottom: 14,
+  },
   bootTitle: { color: colors.text, fontSize: 24, fontWeight: '800', marginTop: 14 },
   bootText: { color: colors.muted, fontSize: 13, marginTop: 6 },
   logoMark: {
@@ -688,23 +685,37 @@ const styles = StyleSheet.create({
     left: -100,
   },
   welcomeContent: { width: '100%' },
-  welcomeLogo: {
-    width: 74,
-    height: 74,
-    borderRadius: 26,
-    backgroundColor: colors.surface2,
+  welcomeAvatarFrame: {
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    padding: 4,
+    backgroundColor: '#151924',
     borderWidth: 1,
-    borderColor: '#302750',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 30,
+    borderColor: '#3A315B',
+    marginBottom: 26,
     shadowColor: colors.purple,
-    shadowOpacity: 0.3,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.35,
+    shadowRadius: 30,
+    shadowOffset: { width: 0, height: 12 },
     elevation: 12,
   },
-  welcomeLogoText: { color: colors.purple, fontSize: 34, fontWeight: '900' },
+  welcomeAvatar: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 42,
+  },
+  avatarStatus: {
+    position: 'absolute',
+    right: 1,
+    bottom: 4,
+    width: 15,
+    height: 15,
+    borderRadius: 8,
+    backgroundColor: colors.mint,
+    borderWidth: 3,
+    borderColor: colors.bg,
+  },
   welcomeKicker: { color: colors.mint, fontSize: 10, letterSpacing: 2, fontWeight: '800', marginBottom: 14 },
   welcomeTitle: { color: colors.text, fontSize: 48, lineHeight: 53, fontWeight: '900', letterSpacing: -1.8 },
   welcomeHeadline: { color: '#C6B8FF', fontSize: 28, lineHeight: 34, fontWeight: '800', marginTop: 2 },
@@ -712,6 +723,7 @@ const styles = StyleSheet.create({
   welcomePills: { flexDirection: 'row', gap: 8, marginTop: 22, marginBottom: 30 },
   welcomePill: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: 20, backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.border },
   welcomePillText: { color: '#AAB0BF', fontSize: 9, fontWeight: '800', letterSpacing: 1.1 },
+  welcomeButtonWrap: { width: '100%' },
   welcomeButton: {
     minHeight: 58,
     borderRadius: 18,
@@ -738,17 +750,20 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     backgroundColor: colors.bg,
   },
-  brandIcon: {
+  headerAvatarFrame: {
     width: 42,
     height: 42,
     borderRadius: 15,
-    backgroundColor: colors.purpleSoft,
+    backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: '#302750',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 2,
   },
-  brandIconText: { color: colors.purple, fontSize: 21, fontWeight: '900' },
+  headerAvatar: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+  },
   brandCopy: { marginLeft: 11, flex: 1 },
   eyebrow: { color: '#737A8B', fontSize: 10, letterSpacing: 1.6, fontWeight: '800' },
   brand: { color: colors.text, fontSize: 21, fontWeight: '900', marginTop: 2, letterSpacing: -0.4 },
