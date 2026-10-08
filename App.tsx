@@ -527,7 +527,7 @@ export default function App() {
 
   const enterApp = () => {
     const trimmedSalary = salaryDraft.trim()
-    if (trimmedSalary) saveSalary(trimmedSalary)
+    if (trimmedSalary && !saveSalary(trimmedSalary)) return
     Animated.parallel([
       Animated.timing(welcomeOpacity, { toValue: 0, duration: 240, useNativeDriver: true }),
       Animated.timing(welcomeY, { toValue: -16, duration: 240, useNativeDriver: true }),
