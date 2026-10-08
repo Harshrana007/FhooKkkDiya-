@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Spendly",
-    "slug": "spendly",
-    "version": "1.0.0",
+    "name": "FhooKkkDiya",
+    "slug": "fhookkkdiya",
+    "version": "1.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "owner": "nnick-dev",
     "icon": "./dist/apple-icon.png",
-    "backgroundColor": "#07090D",
-    "primaryColor": "#8B5CF6",
+    "backgroundColor": "#07080B",
+    "primaryColor": "#9B7CFF",
     "extra": {
       "eas": {
         "projectId": "ed04d1df-f447-4ef0-8180-f80bbc4004ac"
@@ -20,13 +20,13 @@
     },
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#07090D"
+      "backgroundColor": "#07080B"
     },
     "web": {
       "favicon": "./public/icon.svg",
-      "name": "Spendly",
-      "shortName": "Spendly",
-      "themeColor": "#07090D"
+      "name": "FhooKkkDiya",
+      "shortName": "FhooKkkDiya",
+      "themeColor": "#07080B"
     },
     "assetBundlePatterns": ["**/*"]
   }
