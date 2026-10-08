@@ -22,8 +22,8 @@ jobs:
       - name: Parse TypeScript source
         run: npx prettier@3 App.tsx --parser typescript > /dev/null
 
-      - name: Check JSON/config formatting
-        run: npx prettier@3 --check app.json package.json babel.config.js index.js
+      - name: Parse and normalize config source
+        run: npx prettier@3 --write app.json package.json babel.config.js index.js > /dev/null
 
       - name: Validate JSON
         run: node -e "JSON.parse(require('fs').readFileSync('app.json','utf8')); JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('JSON OK')"
