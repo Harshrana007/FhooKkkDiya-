@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Animated, Easing, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 import { StatusBar } from 'expo-status-bar'
+
+const APP_LOGO = require('./dist/apple-icon.png')
 
 const GUTZ_AVATAR_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\">\n  <defs>\n    <linearGradient id=\"bg\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"1\"><stop stop-color=\"#191326\"/><stop offset=\"1\" stop-color=\"#090b11\"/></linearGradient>\n  </defs>\n  <rect width=\"128\" height=\"128\" rx=\"32\" fill=\"url(#bg)\"/>\n  <circle cx=\"64\" cy=\"66\" r=\"34\" fill=\"#e9e1ce\"/>\n  <path d=\"M31 54c2-27 14-39 21-42 2 10 6 13 11 5 4 10 10 3 14-9 4 9 10 12 16 1 4 12 12 11 16 3 2 15 1 27-3 40-10-12-21-16-37-16-15 0-28 5-38 18z\" fill=\"#121116\"/>\n  <path d=\"M44 49c3-13 9-19 20-22 12 2 21 8 25 22-7-6-14-9-25-9-9 0-14 3-20 9z\" fill=\"#ffffff\" opacity=\".65\"/>\n  <circle cx=\"53\" cy=\"67\" r=\"5\" fill=\"#17151a\"/>\n  <circle cx=\"76\" cy=\"67\" r=\"5\" fill=\"#17151a\"/>\n  <path d=\"M56 83c5 4 15 4 20 0\" fill=\"none\" stroke=\"#1a171b\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n  <path d=\"M30 78c12 9 21 12 34 13 12 0 23-3 34-12\" fill=\"none\" stroke=\"#0d0d11\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <path d=\"M50 99c7 6 20 6 28 0\" fill=\"none\" stroke=\"#0d0d11\" stroke-width=\"6\" stroke-linecap=\"round\"/>\n</svg>"
 
@@ -378,6 +380,8 @@ export default function App() {
   const avatarScale = useRef(new Animated.Value(1)).current
   const toastY = useRef(new Animated.Value(12)).current
   const toastOpacity = useRef(new Animated.Value(0)).current
+  const bootLogoScale = useRef(new Animated.Value(0.94)).current
+  const bootLogoOpacity = useRef(new Animated.Value(0.65)).current
 
   useEffect(() => {
     let mounted = true
@@ -477,6 +481,24 @@ export default function App() {
       cancelled = true
     }
   }, [tab, screenOpacity, screenY, screenX])
+
+  useEffect(() => {
+    if (storageReady) return
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(bootLogoScale, { toValue: 1.03, duration: 900, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(bootLogoOpacity, { toValue: 1, duration: 900, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ]),
+        Animated.parallel([
+          Animated.timing(bootLogoScale, { toValue: 0.94, duration: 900, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(bootLogoOpacity, { toValue: 0.72, duration: 900, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ]),
+      ]),
+    )
+    pulse.start()
+    return () => pulse.stop()
+  }, [storageReady, bootLogoScale, bootLogoOpacity])
 
   useEffect(() => {
     if (!welcomeVisible) return
@@ -677,7 +699,9 @@ export default function App() {
       <SafeAreaView style={styles.safe}>
         <StatusBar style="light" />
         <View style={styles.boot}>
-          <View style={styles.logoMark}><SvgIcon xml={ICON_MONEY} size={30} color={colors.white} /></View>
+          <Animated.View style={[styles.bootLogoWrap, { opacity: bootLogoOpacity, transform: [{ scale: bootLogoScale }] }]}>
+            <Image source={APP_LOGO} style={styles.bootLogo} resizeMode="cover" accessibilityLabel="FhooKkkDiya app logo" />
+          </Animated.View>
           <Text style={styles.bootTitle}>FhooKkkDiya</Text>
           <Text style={styles.bootCopy}>Paisa ka post-mortem loading...</Text>
         </View>
@@ -1115,6 +1139,8 @@ const styles = StyleSheet.create({
   bootTitle: { marginTop: 14, color: colors.text, fontSize: 25, fontWeight: '900' },
   bootCopy: { marginTop: 7, color: colors.muted, fontSize: 13 },
   logoMark: { width: 62, height: 62, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.red },
+  bootLogoWrap: { width: 112, height: 112, borderRadius: 29, overflow: 'hidden', marginBottom: 6 },
+  bootLogo: { width: 112, height: 112 },
   logoText: { color: colors.white, fontSize: 29, fontWeight: '900' },
 
   welcomeScreen: { flex: 1, justifyContent: 'center', padding: 25, overflow: 'hidden', backgroundColor: colors.bg },
