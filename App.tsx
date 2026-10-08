@@ -139,6 +139,7 @@ export default function App() {
   const welcomeOpacity = useRef(new Animated.Value(0)).current
   const welcomeY = useRef(new Animated.Value(28)).current
   const orbScale = useRef(new Animated.Value(0.9)).current
+  const orbOpacity = useRef(new Animated.Value(0.35)).current
   const buttonScale = useRef(new Animated.Value(1)).current
   const avatarScale = useRef(new Animated.Value(1)).current
 
@@ -248,13 +249,19 @@ export default function App() {
     ]).start()
     const pulse = Animated.loop(
       Animated.sequence([
-        Animated.timing(orbScale, { toValue: 1.06, duration: 1700, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(orbScale, { toValue: 0.9, duration: 1700, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.parallel([
+          Animated.timing(orbScale, { toValue: 1.06, duration: 1700, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(orbOpacity, { toValue: 0.62, duration: 1700, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ]),
+        Animated.parallel([
+          Animated.timing(orbScale, { toValue: 0.9, duration: 1700, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(orbOpacity, { toValue: 0.35, duration: 1700, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ]),
       ]),
     )
     pulse.start()
     return () => pulse.stop()
-  }, [welcomeVisible, welcomeOpacity, welcomeY, orbScale])
+  }, [welcomeVisible, welcomeOpacity, welcomeY, orbScale, orbOpacity])
 
   const press = (value: Animated.Value, target: number) =>
     Animated.spring(value, { toValue: target, friction: 8, tension: 120, useNativeDriver: true }).start()
@@ -344,8 +351,8 @@ export default function App() {
       <SafeAreaView style={styles.safe}>
         <StatusBar style="light" />
         <View style={styles.welcomeScreen}>
-          <Animated.View pointerEvents="none" style={[styles.orb, { transform: [{ scale: orbScale }] }]} />
-          <Animated.View pointerEvents="none" style={[styles.orb2, { transform: [{ scale: orbScale }] }]} />
+          <Animated.View pointerEvents="none" style={[styles.orb, { opacity: orbOpacity, transform: [{ scale: orbScale }] }]} />
+          <Animated.View pointerEvents="none" style={[styles.orb2, { opacity: Animated.multiply(orbOpacity, 0.7), transform: [{ scale: orbScale }] }]} />
           <Animated.View style={[styles.welcomeContent, { opacity: welcomeOpacity, transform: [{ translateY: welcomeY }] }]}>
             <TouchableOpacity onPress={triggerAvatar} activeOpacity={0.9}>
               <Animated.View style={[styles.avatarLargeWrap, { transform: [{ scale: avatarScale }] }]}>
