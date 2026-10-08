@@ -189,9 +189,6 @@ const deadpanPunchlines = [
 
 const getPunchline = (gaaliMode: boolean, index: number, total: number, count: number, monthTotal = 0, salary = 0, peakExpense = 0) => {
   const salaryPercent = salary > 0 ? Math.round((monthTotal / salary) * 100) : 0
-  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-  const remainingDays = Math.max(1, monthEnd.getDate() - today.getDate() + 1)
-  const safeDaily = salary > 0 ? Math.max(0, salaryRemaining / remainingDays) : 0
   const dynamic = [
     ...(peakExpense >= 20000 ? [
       '₹20,000. Bhai, hosh mein aao. Ye final boss hai.',
@@ -362,6 +359,10 @@ export default function App() {
   const [salary, setSalary] = useState(0)
   const [salaryDraft, setSalaryDraft] = useState('')
   const [deleteCandidate, setDeleteCandidate] = useState<Expense | null>(null)
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
+  const [editDescription, setEditDescription] = useState('')
+  const [editAmount, setEditAmount] = useState('')
+  const [editCategory, setEditCategory] = useState('Food')
   const [toast, setToast] = useState('')
 
   const screenOpacity = useRef(new Animated.Value(1)).current
@@ -566,6 +567,55 @@ export default function App() {
     setSalaryDraft(String(value))
     showToast('💰 Salary locked in. Ab hisaab hoga.')
     return true
+  }
+
+  const startEditExpense = (expense: Expense) => {
+    setEditingExpense(expense)
+    setEditDescription(expense.description)
+    setEditAmount(String(expense.amount))
+    setEditCategory(expense.category)
+  }
+
+  const updateExpense = () => {
+    if (!editingExpense) return
+    const numericAmount = Number(editAmount.replace(/,/g, ''))
+    if (!editDescription.trim() || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+      Alert.alert('Entry adhuri hai', 'Description aur ₹1 se zyada amount daalo.')
+      return
+    }
+    if (numericAmount > MAX_EXPENSE) {
+      Alert.alert('Bhai ruk 😭', 'Per expense max ₹20,000 hai. Isse zyada ko split kar de.')
+      return
+    }
+
+    setExpenses(current => current.map(expense =>
+      expense.id === editingExpense.id
+        ? { ...expense, description: editDescription.trim(), amount: numericAmount, category: editCategory }
+        : expense,
+    ))
+    setEditingExpense(null)
+    setEditDescription('')
+    setEditAmount('')
+    showToast('✏️ Expense updated. Hisaab theek kiya.')
+  }
+
+  const resetSalary = () => {
+    Alert.alert(
+      'Salary reset karein?',
+      'Salary hata di jayegi. Expenses safe rahenge.',
+      [
+        { text: 'Rehne de', style: 'cancel' },
+        {
+          text: 'Reset salary',
+          style: 'destructive',
+          onPress: () => {
+            setSalary(0)
+            setSalaryDraft('')
+            showToast('🧹 Salary reset. Wallet ko fresh start.')
+          },
+        },
+      ],
+    )
   }
 
   const addExpense = () => {
@@ -800,11 +850,11 @@ export default function App() {
                   </View>
                 ) : (
                   todayExpenses.map(expense => (
-                    <TouchableOpacity key={expense.id} activeOpacity={0.86} onLongPress={() => setDeleteCandidate(expense)} style={styles.expenseRow}>
+                    <TouchableOpacity key={expense.id} activeOpacity={0.86} onPress={() => startEditExpense(expense)} onLongPress={() => setDeleteCandidate(expense)} style={styles.expenseRow}>
                       <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.red} /></View>
                       <View style={styles.expenseCopy}>
                         <Text style={styles.expenseName}>{expense.description}</Text>
-                        <Text style={styles.muted}>{expense.category} • long press = delete</Text>
+                        <Text style={styles.muted}>{expense.category} • tap = edit • long press = delete</Text>
                       </View>
                       <Text style={styles.expenseAmount}>{currency(expense.amount)}</Text>
                     </TouchableOpacity>
@@ -845,7 +895,7 @@ export default function App() {
                   <View style={styles.badge}><Text style={styles.badgeNum}>{expenses.length}</Text><Text style={styles.muted}>entries</Text></View>
                 </View>
                 {expenses.map(expense => (
-                  <TouchableOpacity key={expense.id} onLongPress={() => setDeleteCandidate(expense)} style={styles.expenseRow}>
+                  <TouchableOpacity key={expense.id} onPress={() => startEditExpense(expense)} onLongPress={() => setDeleteCandidate(expense)} style={styles.expenseRow}>
                     <View style={styles.expenseIcon}><SvgIcon xml={ICON_MONEY} size={21} color={colors.red} /></View>
                     <View style={styles.expenseCopy}><Text style={styles.expenseName}>{expense.description}</Text><Text style={styles.muted}>{expense.category} • {expense.date}</Text></View>
                     <Text style={styles.expenseAmount}>{currency(expense.amount)}</Text>
@@ -888,6 +938,11 @@ export default function App() {
                     <TouchableOpacity onPress={() => saveSalary(salaryDraft)} style={styles.salarySaveButton}><Text style={styles.primaryText}>Save</Text></TouchableOpacity>
                   </View>
                   <Text style={styles.muted}>{salary > 0 ? `Current: ${currency(salary)} • ${currency(monthTotal)} spent this month` : 'Not set yet.'}</Text>
+                  {salary > 0 && (
+                    <TouchableOpacity accessibilityRole="button" onPress={resetSalary} style={styles.secondaryButton}>
+                      <Text style={styles.secondaryText}>Reset salary</Text>
+                    </TouchableOpacity>
+                  )}
                   <View style={styles.divider} />
                   <View style={styles.rowBetween}>
                     <View style={styles.flex}>
@@ -942,6 +997,63 @@ export default function App() {
                 </TouchableOpacity>
               </View>
             </View>
+          </View>
+        )}
+
+        {editingExpense && (
+          <View style={styles.modalBackdrop}>
+            <KeyboardAvoidingView
+              style={styles.modalKeyboard}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              keyboardVerticalOffset={0}
+            >
+              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={styles.modalScrollContent}>
+                <View style={styles.modal}>
+                  <View style={styles.modalHandle} />
+                  <Text style={styles.title}>✏️ Expense edit karo</Text>
+                  <Text style={styles.muted}>Tap se edit, long press se delete. ₹20,000 max wahi rahega.</Text>
+                  <TextInput
+                    value={editDescription}
+                    onChangeText={setEditDescription}
+                    maxLength={60}
+                    placeholder="Kis cheez pe udaaya?"
+                    placeholderTextColor={colors.dim}
+                    style={styles.input}
+                  />
+                  <TextInput
+                    value={editAmount}
+                    onChangeText={setEditAmount}
+                    keyboardType="decimal-pad"
+                    maxLength={8}
+                    placeholder="Kitne rupaye?"
+                    placeholderTextColor={colors.dim}
+                    style={styles.input}
+                  />
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.chips}
+                    nestedScrollEnabled
+                    keyboardShouldPersistTaps="handled"
+                  >
+                    {categories.map(item => (
+                      <TouchableOpacity key={item} onPress={() => setEditCategory(item)} style={[styles.chip, item === editCategory && styles.chipActive]}>
+                        <Text style={[styles.chipText, item === editCategory && styles.chipTextActive]}>{item}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <View style={styles.modalActions}>
+                    <TouchableOpacity onPress={() => setEditingExpense(null)} style={styles.secondaryButton}>
+                      <Text style={styles.secondaryText}>Rehne de</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={updateExpense} style={styles.primaryButton}>
+                      <Text style={styles.primaryText}>Save changes</Text>
+                      <SvgIcon xml={ICON_ARROW} size={18} color={colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </ScrollView>
+            </KeyboardAvoidingView>
           </View>
         )}
 
